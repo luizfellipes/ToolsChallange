@@ -3,7 +3,6 @@ package com.example.toolschallanger.models;
 
 import com.example.toolschallanger.Dtos.TransacaoRecordDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serial;
@@ -24,59 +23,40 @@ public class TransacaoModel implements Serializable {
     private UUID idCard;
     @NotNull
     private Long card;
-    @NotNull
-    private Float valor;
-    @NotNull
-    private LocalDateTime dataHora;
-    @NotBlank
-    private String estabelecimento;
-    @NotBlank
-    private String tipo;
-    @NotNull
-    private int parcelas;
+    private DescricaoModel descricaoModel;
+
+    private FormaPagamento formaPagamento;
+
 
     public TransacaoModel() {
     }
 
     public TransacaoModel(TransacaoRecordDto dto) {
         this.card = dto.card();
-        this.valor = dto.valor();
-        this.dataHora = conversorDataHora(dto.dataHora());
-        this.estabelecimento = dto.estabelecimento();
-        this.tipo = dto.tipo();
-        this.parcelas = dto.parcelas();
+        descricaoModelValor(dto.valor());
+        conversorDataHora(dto.dataHora());
+        descricaoModelEstabelecimento(dto.estabelecimento());
+        formaPagamentoTipo(dto.tipo());
+        formaPagamentoParcelas(dto.parcelas());
     }
 
-    private LocalDateTime conversorDataHora(CharSequence dataHoraDto){
-        return dataHora = LocalDateTime.parse(dataHoraDto, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    private void descricaoModelValor(Float valorDto) {
+        this.descricaoModel.setValor(valorDto);
     }
 
-    public Long getCard() {
-        return card;
+    private void conversorDataHora(CharSequence dataHoraDto) {
+        this.descricaoModel.setDataHora(LocalDateTime.parse(dataHoraDto, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
     }
 
-    public UUID getIdCard() {
-        return idCard;
+    private void descricaoModelEstabelecimento(String estabelecimentoDto){
+        this.descricaoModel.setEstabelecimento(estabelecimentoDto);
     }
 
-    public Float getValor() {
-        return valor;
+    private void formaPagamentoTipo(String tipoDto){
+        this.formaPagamento.setTipo(tipoDto);
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
+    private void formaPagamentoParcelas(int parcelasDto){
+        this.formaPagamento.setParcelas(parcelasDto);
     }
-
-    public String getEstabelecimento() {
-        return estabelecimento;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public int getParcelas() {
-        return parcelas;
-    }
-
 }
