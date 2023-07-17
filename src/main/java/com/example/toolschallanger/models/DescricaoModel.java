@@ -1,19 +1,28 @@
 package com.example.toolschallanger.models;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class DescricaoModel {
+@Component
+@Entity
+@Table(name = "TB_DESCRICAO")
+public class DescricaoModel implements Serializable {
 
-    @NotNull
+
+    @Id
+    private Long id;
     private Float valor;
-    @NotNull
     private LocalDateTime dataHora;
-    @NotBlank
     private String estabelecimento;
 
+    public DescricaoModel() {
+    }
 
     public Float getValor() {
         return valor;

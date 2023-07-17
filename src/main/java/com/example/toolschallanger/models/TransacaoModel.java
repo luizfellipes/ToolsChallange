@@ -3,7 +3,10 @@ package com.example.toolschallanger.models;
 
 import com.example.toolschallanger.Dtos.TransacaoRecordDto;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-
+@Component
 @Entity
 @Table(name = "TB_TRASANCAO")
 public class TransacaoModel implements Serializable {
@@ -21,42 +24,24 @@ public class TransacaoModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idCard;
-    @NotNull
     private Long card;
-    private DescricaoModel descricaoModel;
-
-    private FormaPagamento formaPagamento;
-
 
     public TransacaoModel() {
     }
 
-    public TransacaoModel(TransacaoRecordDto dto) {
-        this.card = dto.card();
-        descricaoModelValor(dto.valor());
-        conversorDataHora(dto.dataHora());
-        descricaoModelEstabelecimento(dto.estabelecimento());
-        formaPagamentoTipo(dto.tipo());
-        formaPagamentoParcelas(dto.parcelas());
+    public UUID getIdCard() {
+        return idCard;
     }
 
-    private void descricaoModelValor(Float valorDto) {
-        this.descricaoModel.setValor(valorDto);
+    public void setIdCard(UUID idCard) {
+        this.idCard = idCard;
     }
 
-    private void conversorDataHora(CharSequence dataHoraDto) {
-        this.descricaoModel.setDataHora(LocalDateTime.parse(dataHoraDto, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+    public Long getCard() {
+        return card;
     }
 
-    private void descricaoModelEstabelecimento(String estabelecimentoDto){
-        this.descricaoModel.setEstabelecimento(estabelecimentoDto);
-    }
-
-    private void formaPagamentoTipo(String tipoDto){
-        this.formaPagamento.setTipo(tipoDto);
-    }
-
-    private void formaPagamentoParcelas(int parcelasDto){
-        this.formaPagamento.setParcelas(parcelasDto);
+    public void setCard(Long card) {
+        this.card = card;
     }
 }
