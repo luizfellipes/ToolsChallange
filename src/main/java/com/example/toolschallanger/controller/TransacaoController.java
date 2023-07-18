@@ -27,6 +27,8 @@ public class TransacaoController {
     @PostMapping("/transacao")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         BeanUtils.copyProperties(transacaoRecordDto, transacaoModel);
+        transacaoModel.setDescricaoModel(transacaoRecordDto.transacaoModel().getDescricaoModel());
+        transacaoModel.setFormaPagamentoModel(transacaoRecordDto.transacaoModel().getFormaPagamentoModel());
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoRepository.save(transacaoModel));
     }
 
@@ -39,8 +41,21 @@ public class TransacaoController {
     @GetMapping("/transacao/{id}")
     public ResponseEntity<Object> getOneTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacao = transacaoRepository.findById(id);
-        return transacao.<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
+        return transacao.<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
     }
+
+    @DeleteMapping("deleteTransacao/{id}")
+    public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
+        Optional<TransacaoModel> transacaoModelOptional = transacaoRepository.findById(id);
+        if (!transacaoModelOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transacao não encontrada !");
+        } else {
+            transacaoRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Transacao deletada com sucesso !");
+        }
+    }
+
 
 
 }
