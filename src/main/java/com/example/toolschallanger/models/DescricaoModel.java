@@ -49,8 +49,4 @@ public class DescricaoModel implements Serializable {
     public void setEstabelecimento(String estabelecimento) {
         this.estabelecimento = estabelecimento;
     }
-
-    private LocalDateTime conversorDataHora(CharSequence dataHoraV){
-        return dataHora = LocalDateTime.parse(dataHoraV, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-    }
 }

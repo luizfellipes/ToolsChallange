@@ -1,6 +1,7 @@
 package com.example.toolschallanger.controller;
 
 import com.example.toolschallanger.Dtos.TransacaoRecordDto;
+import com.example.toolschallanger.TransacaoService.TransacaoService;
 import com.example.toolschallanger.models.TransacaoModel;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 import jakarta.validation.Valid;
@@ -22,16 +23,14 @@ public class TransacaoController {
     private TransacaoRepository transacaoRepository;
     @Autowired
     private TransacaoModel transacaoModel;
-
+    @Autowired
+    TransacaoService transacaoService;
 
     @PostMapping("/transacao")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
-        BeanUtils.copyProperties(transacaoRecordDto, transacaoModel);
-        transacaoModel.setDescricaoModel(transacaoRecordDto.transacaoModel().getDescricaoModel());
-        transacaoModel.setFormaPagamentoModel(transacaoRecordDto.transacaoModel().getFormaPagamentoModel());
+        transacaoService.setAtributosDtoModel(transacaoRecordDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoRepository.save(transacaoModel));
     }
-
 
     @GetMapping("/transacao")
     public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
@@ -48,7 +47,7 @@ public class TransacaoController {
     @DeleteMapping("deleteTransacao/{id}")
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoRepository.findById(id);
-        if (!transacaoModelOptional.isPresent()) {
+        if (transacaoModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transacao não encontrada !");
         } else {
             transacaoRepository.deleteById(id);
@@ -56,6 +55,16 @@ public class TransacaoController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateTransacao(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
+        Optional<TransacaoModel> transacaoModelOptional = transacaoRepository.findById(id);
+        if (transacaoModelOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !");
+        }
+        transacaoModel = transacaoModelOptional.get();
+        BeanUtils.copyProperties(transacaoRecordDto, transacaoModel);
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoRepository.save(transacaoModel));
+    }
 
 
 }

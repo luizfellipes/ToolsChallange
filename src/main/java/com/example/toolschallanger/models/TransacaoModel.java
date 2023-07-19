@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
@@ -57,6 +56,9 @@ public class TransacaoModel implements Serializable {
 
     public void setFormaPagamentoModel(FormaPagamentoModel formaPagamentoModel) {
         this.formaPagamentoModel = formaPagamentoModel;
+    }
+    public void setHora(LocalDateTime datahora){
+        this.descricaoModel.setDataHora(datahora);
     }
 
 }

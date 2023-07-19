@@ -20,14 +20,6 @@ public class FormaPagamentoModel implements Serializable {
     public FormaPagamentoModel() {
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getTipo() {
         return tipo;
     }
