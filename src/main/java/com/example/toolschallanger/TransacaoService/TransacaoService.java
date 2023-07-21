@@ -13,7 +13,7 @@ public class TransacaoService {
     private TransacaoModel transacaoModel;
 
     public void setAtributosDtoModel(TransacaoRecordDto transacaoRecordDto) {
-        BeanUtils.copyProperties(transacaoRecordDto, transacaoModel);
+        transacaoModel.setCard(transacaoRecordDto.transacaoModel().getCard());
         transacaoModel.setDescricaoModel(transacaoRecordDto.transacaoModel().getDescricaoModel());
         transacaoModel.setFormaPagamentoModel(transacaoRecordDto.transacaoModel().getFormaPagamentoModel());
     }

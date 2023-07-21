@@ -17,9 +17,8 @@ public class DescricaoModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
-    private double valor;
+    private Double valor;
     private LocalDateTime dataHora;
     private String estabelecimento;
 
