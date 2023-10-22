@@ -1,14 +1,14 @@
-package com.example.toolschallanger.models;
+package com.example.toolschallanger.models.entities;
 
+import com.example.toolschallanger.models.entities.DescricaoModel;
+import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import jakarta.persistence.*;
-import org.springframework.stereotype.Component;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Component
+
 @Entity
 @Table(name = "TB_TRASANCAO")
 public class TransacaoModel implements Serializable {
@@ -19,7 +19,9 @@ public class TransacaoModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idCard;
     private Long card;
+    @Embedded
     private DescricaoModel descricaoModel;
+    @Embedded
     private FormaPagamentoModel formaPagamentoModel;
 
 
