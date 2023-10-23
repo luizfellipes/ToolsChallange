@@ -15,8 +15,8 @@ public class TransacaoModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idCard;
-    private Long card;
+    private UUID id;
+    private Long cartao;
     @Embedded
     private DescricaoModel descricaoModel;
     @Embedded
@@ -25,20 +25,26 @@ public class TransacaoModel implements Serializable {
     public TransacaoModel() {
     }
 
-    public UUID getIdCard() {
-        return idCard;
+    public TransacaoModel(Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
+        this.cartao = cartao;
+        this.descricaoModel = descricaoModel;
+        this.formaPagamentoModel = formaPagamentoModel;
     }
 
-    public void setIdCard(UUID idCard) {
-        this.idCard = idCard;
+    public UUID getId() {
+        return id;
     }
 
-    public Long getCard() {
-        return card;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public void setCard(Long card) {
-        this.card = card;
+    public Long getCartao() {
+        return cartao;
+    }
+
+    public void setCartao(Long cartao) {
+        this.cartao = cartao;
     }
 
     public DescricaoModel getDescricaoModel() {
@@ -56,5 +62,4 @@ public class TransacaoModel implements Serializable {
     public void setFormaPagamentoModel(FormaPagamentoModel formaPagamentoModel) {
         this.formaPagamentoModel = formaPagamentoModel;
     }
-
 }

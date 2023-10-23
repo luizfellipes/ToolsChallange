@@ -17,7 +17,7 @@ public class TransacaoService {
 
     public TransacaoModel save(TransacaoModel transacaoModel) {
         transacaoModel.getDescricaoModel().geraValoresAutomatico();
-        verificaValorParaParcela(transacaoModel);
+        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel);
         return transacaoRepository.save(transacaoModel);
     }
 
@@ -31,12 +31,6 @@ public class TransacaoService {
 
     public void deleteById(UUID id) {
         transacaoRepository.deleteById(id);
-    }
-
-    public void verificaValorParaParcela(TransacaoModel transacaoModel) {
-        if (transacaoModel.getDescricaoModel().getValor() < 100) {
-            transacaoModel.getFormaPagamentoModel().validaParcela();
-        }
     }
 
 }

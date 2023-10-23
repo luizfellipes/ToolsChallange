@@ -27,10 +27,13 @@ public class DescricaoModel {
     public DescricaoModel() {
     }
 
-    public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento) {
+    public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
+        this.nsu = nsu;
+        this.codigoAutorizacao = codigoAutorizacao;
+        this.status = status;
     }
 
     public Double getValor() {
@@ -79,7 +82,7 @@ public class DescricaoModel {
 
     public void geraCodigoAutorizacaoValido() {
         if (this.valor <= 0) {
-            this.codigoAutorizacao = 00000.00;
+            this.codigoAutorizacao = 0D;
         } else {
             this.codigoAutorizacao = Math.random();
         }
@@ -92,13 +95,18 @@ public class DescricaoModel {
             this.status = Status.AUTORIZADO;
         }
     }
+    public void verificaValorNegativo() {
+        if (this.valor < 0) {
+            throw new RuntimeException("Valores negativos não são permitidos !");
+        }
+    }
 
-    public void geraValoresAutomatico(){
+    public void geraValoresAutomatico() {
+        verificaValorNegativo();
         geraNsuValido();
         geraCodigoAutorizacaoValido();
         verificaStatus();
     }
-
 
 }
 

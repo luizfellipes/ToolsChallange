@@ -37,8 +37,8 @@ public class FormaPagamentoModel {
         this.parcelas = parcelas;
     }
 
-    public void validaParcela() {
-        if (this.parcelas <= 1 && this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.parcelas <= 1 && this.tipo == FormaPagamento.PACELADO_LOJA) {
+    public void validaParcela(TransacaoModel transacaoModel) {
+        if (this.parcelas <= 1 && (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PACELADO_LOJA)) {
             throw new RuntimeException("Não foi possivel parcelar sua compra !");
         }
     }

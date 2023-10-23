@@ -40,7 +40,7 @@ public class TransacaoController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
     }
 
-    @DeleteMapping("deleteTransacao/{id}")
+    @DeleteMapping("/deleteTransacao/{id}")
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
         if (transacaoModelOptional.isEmpty()) {
