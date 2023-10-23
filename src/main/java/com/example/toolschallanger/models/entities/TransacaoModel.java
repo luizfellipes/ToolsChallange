@@ -1,7 +1,5 @@
 package com.example.toolschallanger.models.entities;
 
-import com.example.toolschallanger.models.entities.DescricaoModel;
-import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -23,7 +21,6 @@ public class TransacaoModel implements Serializable {
     private DescricaoModel descricaoModel;
     @Embedded
     private FormaPagamentoModel formaPagamentoModel;
-
 
     public TransacaoModel() {
     }

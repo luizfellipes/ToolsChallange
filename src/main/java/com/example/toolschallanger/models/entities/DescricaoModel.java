@@ -21,7 +21,7 @@ public class DescricaoModel {
     private String estabelecimento;
     private Double nsu;
     private Double codigoAutorizacao;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public DescricaoModel() {
@@ -31,9 +31,6 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
-        geraNsuValido();
-        geraCodigoAutorizacaoValido();
-        verificaStatus();
     }
 
     public Double getValor() {
@@ -60,32 +57,47 @@ public class DescricaoModel {
         return status;
     }
 
+    public void setNsu(Double nsu) {
+        this.nsu = nsu;
+    }
 
-    public void geraNsuValido(){
-        if (valor < 0) {
-            this.nsu = 00000.00;
-        }else {
+    public void setCodigoAutorizacao(Double codigoAutorizacao) {
+        this.codigoAutorizacao = codigoAutorizacao;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void geraNsuValido() {
+        if (this.valor <= 0) {
+            this.nsu = 0D;
+        } else {
             this.nsu = Math.random();
         }
     }
 
-    public void geraCodigoAutorizacaoValido(){
-        if (valor < 0) {
+    public void geraCodigoAutorizacaoValido() {
+        if (this.valor <= 0) {
             this.codigoAutorizacao = 00000.00;
-        }else {
+        } else {
             this.codigoAutorizacao = Math.random();
         }
     }
 
     public void verificaStatus() {
-        if (valor < 0) {
+        if (this.valor <= 0) {
             this.status = Status.NEGADO;
         } else {
             this.status = Status.AUTORIZADO;
         }
     }
 
-
+    public void geraValoresAutomatico(){
+        geraNsuValido();
+        geraCodigoAutorizacaoValido();
+        verificaStatus();
+    }
 
 
 }

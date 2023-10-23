@@ -15,14 +15,9 @@ public class TransacaoService {
     @Autowired
     private TransacaoRepository transacaoRepository;
 
-
-   /* public void setAtributosDtoModel(TransacaoRecordDto transacaoRecordDto) {
-        transacaoModel.setCard(transacaoRecordDto.transacaoModel().getCard());
-        transacaoModel.setDescricaoModel(transacaoRecordDto.transacaoModel().getDescricaoModel());
-        transacaoModel.setFormaPagamentoModel(transacaoRecordDto.transacaoModel().getFormaPagamentoModel());
-    }*/
-
     public TransacaoModel save(TransacaoModel transacaoModel) {
+        transacaoModel.getDescricaoModel().geraValoresAutomatico();
+        verificaValorParaParcela(transacaoModel);
         return transacaoRepository.save(transacaoModel);
     }
 
@@ -34,8 +29,14 @@ public class TransacaoService {
         return transacaoRepository.findById(id);
     }
 
-
     public void deleteById(UUID id) {
         transacaoRepository.deleteById(id);
     }
+
+    public void verificaValorParaParcela(TransacaoModel transacaoModel) {
+        if (transacaoModel.getDescricaoModel().getValor() < 100) {
+            transacaoModel.getFormaPagamentoModel().validaParcela();
+        }
+    }
+
 }
