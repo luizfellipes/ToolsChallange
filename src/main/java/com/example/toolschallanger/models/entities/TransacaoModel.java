@@ -8,7 +8,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "TB_TRASANCAO")
+@Table(name = "TB_TRANSACAO")
 public class TransacaoModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
