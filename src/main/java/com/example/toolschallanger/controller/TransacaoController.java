@@ -1,6 +1,8 @@
 package com.example.toolschallanger.controller;
 
 import com.example.toolschallanger.models.dtos.TransacaoRecordDto;
+import com.example.toolschallanger.models.enuns.FormaPagamento;
+import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import jakarta.validation.Valid;
@@ -23,9 +25,12 @@ public class TransacaoController {
 
     @PostMapping("/transacao")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
-       // transacaoService.setAtributosDtoModel(transacaoRecordDto);
-       // BeanUtils.copyProperties(transacaoRecordDto, transacaoModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));
+    }
+
+    @PostMapping("/estorno/{id}")
+    public ResponseEntity<TransacaoModel> estorno(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto.transacaoModel()));
     }
 
     @GetMapping("/transacao")

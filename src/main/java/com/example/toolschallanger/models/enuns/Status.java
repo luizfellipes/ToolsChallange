@@ -1,5 +1,5 @@
 package com.example.toolschallanger.models.enuns;
 
 public enum Status {
-    AUTORIZADO, NEGADO;
+    AUTORIZADO, NEGADO, ESTORNADO;
 }
