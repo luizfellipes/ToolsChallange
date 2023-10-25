@@ -43,6 +43,25 @@ Response:
     }
 }
 ~~~
+Estorno:
+~~~
+{
+    "id": "c90f552d-b7ec-4eaf-89f0-6bb1c81e9f61",
+    "cartao": 1234567890,
+    "descricaoModel": {
+        "valor": 99.0,
+        "dataHora": "2021-01-01T18:30:00",
+        "estabelecimento": "PetShop Mundo Cão",
+        "nsu": null,
+        "codigoAutorizacao": null,
+        "status": "CANCELADO"
+    },
+    "formaPagamentoModel": {
+        "tipo": "PARCELADO_EMISSOR",
+        "parcelas": 2
+    }
+}
+~~~
 
 <h3>Iniciando...</h3>
 - jdk18

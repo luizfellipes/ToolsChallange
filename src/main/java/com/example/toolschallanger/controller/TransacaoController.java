@@ -50,10 +50,10 @@ public class TransacaoController {
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
         if (transacaoModelOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transacao não encontrada !");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !");
         } else {
             transacaoService.deleteById(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Transacao deletada com sucesso !");
+            return ResponseEntity.status(HttpStatus.OK).body("Transação deletada com sucesso !");
         }
     }
 
