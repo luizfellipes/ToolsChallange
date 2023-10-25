@@ -23,6 +23,7 @@ public class TransacaoController {
     @Autowired
     TransacaoService transacaoService;
 
+
     @PostMapping("/transacao")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));

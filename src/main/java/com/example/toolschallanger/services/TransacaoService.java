@@ -24,7 +24,7 @@ public class TransacaoService {
     }
 
     public TransacaoModel estorno(TransacaoModel transacaoModel) {
-        transacaoModel.getDescricaoModel().setStatus(Status.ESTORNADO);
+        transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO);
         return transacaoRepository.save(transacaoModel);
     }
 

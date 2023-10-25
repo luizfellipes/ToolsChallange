@@ -2,14 +2,8 @@ package com.example.toolschallanger.models.entities;
 
 import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.springframework.stereotype.Component;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 
 //@Entity
@@ -95,6 +89,7 @@ public class DescricaoModel {
             this.status = Status.AUTORIZADO;
         }
     }
+
     public void verificaValorNegativo() {
         if (this.valor < 0) {
             throw new RuntimeException("Valores negativos não são permitidos !");

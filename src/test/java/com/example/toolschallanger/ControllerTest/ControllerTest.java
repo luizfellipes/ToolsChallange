@@ -45,13 +45,13 @@ public class ControllerTest {
 
     @Test
     public void deveTestarTransacaoTestEstorno() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(1065151L, new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.ESTORNADO), new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
+        TransacaoModel transacaoModel = new TransacaoModel(1065151L, new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.CANCELADO), new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
         mockMvc.perform(post("/estorno/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andExpect(status().isCreated());
-        Assertions.assertEquals(Status.ESTORNADO, transacaoRecordDto.transacaoModel().getDescricaoModel().getStatus());
+        Assertions.assertEquals(Status.CANCELADO, transacaoRecordDto.transacaoModel().getDescricaoModel().getStatus());
     }
 
     @Test
