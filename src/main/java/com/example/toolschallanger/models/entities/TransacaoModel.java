@@ -31,6 +31,13 @@ public class TransacaoModel implements Serializable {
         this.formaPagamentoModel = formaPagamentoModel;
     }
 
+    public TransacaoModel(UUID id, Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
+        this.id = id;
+        this.cartao = cartao;
+        this.descricaoModel = descricaoModel;
+        this.formaPagamentoModel = formaPagamentoModel;
+    }
+
     public UUID getId() {
         return id;
     }
