@@ -5,6 +5,7 @@ import com.example.toolschallanger.models.enuns.FormaPagamento;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
 import com.example.toolschallanger.models.entities.TransacaoModel;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,35 +19,41 @@ import java.util.UUID;
 
 
 @RestController
+@RequestMapping("/transacao")
 public class TransacaoController {
 
     @Autowired
     TransacaoService transacaoService;
 
 
-    @PostMapping("/transacao")
+    @PostMapping("/save")
+    @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));
     }
 
     @PostMapping("/estorno/{id}")
+    @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> estorno(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto.transacaoModel()));
     }
 
-    @GetMapping("/transacao")
+    @GetMapping("/get")
+    @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
     public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
     }
 
-    @GetMapping("/transacao/{id}")
+    @GetMapping("/{id}")
+    @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
     public ResponseEntity<Object> getOneTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacao = transacaoService.findById(id);
         return transacao.<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
     }
 
-    @DeleteMapping("/deleteTransacao/{id}")
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
         if (transacaoModelOptional.isEmpty()) {
@@ -57,7 +64,8 @@ public class TransacaoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
+    @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
     public ResponseEntity<Object> updateTransacao(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
         if (transacaoModelOptional.isEmpty()) {
