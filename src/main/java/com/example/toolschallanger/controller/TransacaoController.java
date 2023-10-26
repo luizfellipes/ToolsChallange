@@ -18,13 +18,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/transacao")
+@CrossOrigin(origins = "*")
 public class TransacaoController {
 
     @Autowired
     TransacaoService transacaoService;
 
 
-    @PostMapping("/save")
+    @PostMapping("/")
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));
@@ -36,7 +37,7 @@ public class TransacaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto.transacaoModel()));
     }
 
-    @GetMapping("/get")
+    @GetMapping("/")
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
     public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
@@ -50,7 +51,7 @@ public class TransacaoController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
@@ -62,7 +63,7 @@ public class TransacaoController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
     public ResponseEntity<Object> updateTransacao(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         Optional<TransacaoModel> transacaoModelOptional = transacaoService.findById(id);
