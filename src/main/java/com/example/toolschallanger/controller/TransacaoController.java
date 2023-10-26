@@ -1,8 +1,6 @@
 package com.example.toolschallanger.controller;
 
 import com.example.toolschallanger.models.dtos.TransacaoRecordDto;
-import com.example.toolschallanger.models.enuns.FormaPagamento;
-import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import io.swagger.v3.oas.annotations.Operation;

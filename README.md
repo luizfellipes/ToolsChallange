@@ -68,6 +68,7 @@ Estorno:
 - https://github.com/luizfellipes/ToolsChallange.git
 - baixar todas as dependencias solicitada no pom.xml
 - Banco de Dados Relacional em memoria H2
+- Swagger http://localhost:8080/swagger-ui/index.html#/
 
 <h3>Executando a aplicação</h3>
 
