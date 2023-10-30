@@ -17,7 +17,6 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/transacao")
 @CrossOrigin(origins = "*")
 public class TransacaoController {
 
@@ -46,8 +45,8 @@ public class TransacaoController {
     @GetMapping("/{id}")
     @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
     public ResponseEntity<Object> getOneTransacao(@PathVariable(value = "id") UUID id) {
-        Optional<TransacaoModel> transacao = transacaoService.findById(id);
-        return transacao.<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model))
+        Optional<TransacaoModel> transacaoModel = transacaoService.findById(id);
+        return transacaoModel.<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
     }
 
