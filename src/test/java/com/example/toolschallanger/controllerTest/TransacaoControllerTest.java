@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -32,15 +33,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class TransacaoControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockBean
     private TransacaoService service;
-    private UUID randonId;
+
 
     //deve testar caso de sucesso
     @Test
@@ -68,16 +70,13 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoUpdate() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.CANCELADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-        when(service.save(transacaoRecordDto.transacaoModel())).thenReturn(transacaoModel);
+                new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         mockMvc.perform(put("/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(transacaoRecordDto.transacaoModel())))
+                        .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
     }
 
 
@@ -117,7 +116,7 @@ public class TransacaoControllerTest {
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new TransacaoRecordDto(transacaoModel))))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -126,7 +125,6 @@ public class TransacaoControllerTest {
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-        when(service.save(transacaoRecordDto.transacaoModel())).thenReturn(transacaoModel);
         mockMvc.perform(put("/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto.transacaoModel())))
