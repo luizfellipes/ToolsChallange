@@ -47,7 +47,7 @@ public class TransacaoControllerTest {
     //deve testar caso de sucesso
     @Test
     public void deveTestarTransacao() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(1065151L, new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO), new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
+        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L, new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO), new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -70,13 +70,17 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoUpdate() throws Exception {
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(new TransacaoModel(UUID.randomUUID(), 1065151L,
+        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.CANCELADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-        mockMvc.perform(put("/" + transacaoRecordDto.transacaoModel().getId())
+                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+        when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
+        mockMvc.perform(put("/" + transacaoModel.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andExpect(status().isOk());
+        Assertions.assertNotNull(transacaoRecordDto);
+        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
     }
 
 
