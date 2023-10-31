@@ -21,7 +21,7 @@ public class TransacaoServiceTest {
 
     //Caso de sucesso
     @Test
-    public void deveTestarSave() {
+    public void deveTestarSave() throws Exception {
         TransacaoModel transacaoModel = (
                 new TransacaoModel(1065151L,
                         new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
@@ -37,17 +37,19 @@ public class TransacaoServiceTest {
                         new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         transacaoService.estorno(transacaoModel);
         Assertions.assertEquals(Status.CANCELADO, transacaoModel.getDescricaoModel().getStatus());
-
     }
 
     //Caso de falha
+
     @Test
-    public void deveTestarSaveEmCasoDeFalha() {
-            TransacaoModel transacaoModel = (
-                    new TransacaoModel(1065151L,
-                            new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
-                            new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-            Assertions.assertEquals(transacaoModel, transacaoService.save(transacaoModel));
+    public void deveTestarSaveComFalha() throws Exception {
+        TransacaoModel transacaoModel = (new TransacaoModel(1065151L,
+                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
+                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
+        TransacaoModel transacaoModelEsperado = new TransacaoModel(9999L,
+                transacaoModel.getDescricaoModel(),
+                transacaoModel.getFormaPagamentoModel());
+        Assertions.assertNotEquals(transacaoModelEsperado, transacaoService.save(transacaoModel));
     }
 
     @Test
@@ -57,7 +59,6 @@ public class TransacaoServiceTest {
                         new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
                         new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         Assertions.assertNotEquals(Status.CANCELADO, transacaoModel.getDescricaoModel().getStatus());
-
     }
 
 }

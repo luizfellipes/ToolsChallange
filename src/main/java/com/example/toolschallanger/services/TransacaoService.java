@@ -1,7 +1,6 @@
 package com.example.toolschallanger.services;
 
 import com.example.toolschallanger.models.entities.TransacaoModel;
-import com.example.toolschallanger.models.enuns.FormaPagamento;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
