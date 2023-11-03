@@ -86,11 +86,11 @@ public class DescricaoModel {
         }
     }
 
-    public void verificaStatus() {
+    public Status verificaStatus() {
         if (this.valor <= 0) {
-            this.status = Status.NEGADO;
+            return this.status = Status.NEGADO;
         } else {
-            this.status = Status.AUTORIZADO;
+            return this.status = Status.AUTORIZADO;
         }
     }
 

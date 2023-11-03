@@ -3,7 +3,6 @@ package com.example.toolschallanger.entitiesTest;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
-import com.example.toolschallanger.models.enuns.FormaPagamento;
 import com.example.toolschallanger.models.enuns.Status;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
