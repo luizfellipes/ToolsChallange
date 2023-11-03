@@ -10,10 +10,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class TransacaoServiceTest {
 
     @Autowired
@@ -21,7 +23,7 @@ public class TransacaoServiceTest {
 
     //Caso de sucesso
     @Test
-    public void deveTestarSave() throws Exception {
+    public void deveTestarSave()  {
         TransacaoModel transacaoModel = (
                 new TransacaoModel(1065151L,
                         new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
@@ -42,7 +44,7 @@ public class TransacaoServiceTest {
     //Caso de falha
 
     @Test
-    public void deveTestarSaveComFalha() throws Exception {
+    public void deveTestarSaveComFalha() {
         TransacaoModel transacaoModel = (new TransacaoModel(1065151L,
                         new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
                         new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));

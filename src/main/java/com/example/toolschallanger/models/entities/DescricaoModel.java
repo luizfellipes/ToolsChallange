@@ -54,6 +54,10 @@ public class DescricaoModel {
         return status;
     }
 
+    public void setValor(Double valor) {
+        this.valor = valor;
+    }
+
     public void setNsu(Double nsu) {
         this.nsu = nsu;
     }
