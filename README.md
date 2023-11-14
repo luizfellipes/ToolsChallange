@@ -72,9 +72,10 @@ Estorno:
 
 <h3>Executando a aplicação</h3>
 
-Como se trata de uma aplicação teste rode ela pela classe SpringApplication.run, compile ou execute o DockerFile.
+Como se trata de uma aplicação teste rode ela pela classe SpringApplication.run, compile ou execute o Dockerfile.
 
-docker run -p 8080:8080 ToolsChallange-Java
+docker build -t toolschallange .<br>
+docker run -p 8080:8080 toolschallange
 
 <h3>Objetivo</h3>
 Criar uma API Rest para estudos baseado em java com framework SpringBoot

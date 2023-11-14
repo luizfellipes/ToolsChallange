@@ -8,8 +8,4 @@ import jakarta.validation.constraints.NotNull;
 public record TransacaoRecordDto(@NotNull
                                  @JsonProperty
                                  TransacaoModel transacaoModel) {
-
-
-
-
 }
