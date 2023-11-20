@@ -17,14 +17,18 @@ public class TransacaoService {
     private TransacaoRepository transacaoRepository;
 
     public TransacaoModel save(TransacaoModel transacaoModel) {
-        transacaoModel.getDescricaoModel().geraValoresAutomatico();
-        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel);
-        return transacaoRepository.save(transacaoModel);
+        if (transacaoModel.getFormaPagamentoModel() != null || transacaoModel.getDescricaoModel() != null) {
+            transacaoModel.getDescricaoModel().geraValoresAutomatico();
+            transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel);
+            return transacaoRepository.save(transacaoModel);
+        } else throw new RuntimeException("Transacao Vazia !");
     }
 
     public TransacaoModel estorno(TransacaoModel transacaoModel) {
-        transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO);
-        return transacaoRepository.save(transacaoModel);
+        if (transacaoModel.getDescricaoModel().getStatus() == Status.AUTORIZADO) {
+            transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO);
+            return transacaoRepository.save(transacaoModel);
+        } else throw new RuntimeException("Não é possivel estornar uma transação diferente de AUTORIZADO !");
     }
 
     public List<TransacaoModel> findAll() {

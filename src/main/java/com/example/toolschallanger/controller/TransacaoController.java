@@ -27,7 +27,10 @@ public class TransacaoController {
     @PostMapping("/")
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));
+        if (transacaoRecordDto.transacaoModel().getDescricaoModel() == null || transacaoRecordDto.transacaoModel().getFormaPagamentoModel() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else
+            return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto.transacaoModel()));
     }
 
     @PostMapping("/estorno/{id}")
@@ -39,7 +42,9 @@ public class TransacaoController {
     @GetMapping("/")
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
     public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
-        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
+        if (!transacaoService.findAll().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
+        } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @GetMapping("/{id}")
