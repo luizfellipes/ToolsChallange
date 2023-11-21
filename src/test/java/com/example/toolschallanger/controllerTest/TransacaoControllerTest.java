@@ -84,12 +84,12 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetAll() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk());
         TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         when(service.findAll()).thenReturn(List.of(transacaoModel));
         List<TransacaoModel> transacaoModelList = service.findAll();
+        mockMvc.perform(get("/")).andExpect(status().isOk());
         Assertions.assertNotNull(transacaoModelList);
     }
 
