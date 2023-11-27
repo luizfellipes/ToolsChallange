@@ -48,12 +48,12 @@ public class TransacaoControllerTest {
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-        mockMvc.perform(post("/")
+        when(service.save(transacaoModel)).thenReturn(transacaoModel);
+        Assertions.assertNotNull(mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isCreated());
-        Assertions.assertNotNull(transacaoRecordDto.transacaoModel());
-        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
+                .andExpect(status().isCreated()));
+        Assertions.assertEquals(transacaoModel, service.save(transacaoRecordDto.transacaoModel()));
     }
 
     @Test
@@ -74,12 +74,12 @@ public class TransacaoControllerTest {
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
         when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
-        mockMvc.perform(put("/" + transacaoModel.getId())
+        when(service.save(transacaoModel)).thenReturn(transacaoModel);
+        Assertions.assertNotNull(mockMvc.perform(put("/" + transacaoModel.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isOk());
-        Assertions.assertNotNull(transacaoRecordDto.transacaoModel());
-        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
+                .andExpect(status().isOk()));
+        Assertions.assertEquals(transacaoModel, service.save(transacaoRecordDto.transacaoModel()));
     }
 
     @Test
@@ -91,6 +91,7 @@ public class TransacaoControllerTest {
         List<TransacaoModel> transacaoModelList = service.findAll();
         mockMvc.perform(get("/")).andExpect(status().isOk());
         Assertions.assertNotNull(transacaoModelList);
+        Assertions.assertEquals(transacaoModelList, service.findAll());
     }
 
     @Test
@@ -101,6 +102,7 @@ public class TransacaoControllerTest {
         when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(get("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
+        Assertions.assertEquals(Optional.of(transacaoModel), service.findById(transacaoModel.getId()));
     }
 
     @Test
@@ -111,18 +113,19 @@ public class TransacaoControllerTest {
         when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(delete("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
+        Assertions.assertEquals(Optional.of(transacaoModel), service.findById(transacaoModel.getId()));
     }
 
     //deve testar caso de falha
     @Test
     public void deveTestarTransacao_CasoDeFalha() throws Exception {
-            TransacaoModel transacaoModel = new TransacaoModel();
-            TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-            mockMvc.perform(post("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                    .andExpect(status().isBadRequest());
-            Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
+        TransacaoModel transacaoModel = new TransacaoModel();
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+        mockMvc.perform(post("/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(transacaoRecordDto)))
+                .andExpect(status().isBadRequest());
+        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
     }
 
     @Test
