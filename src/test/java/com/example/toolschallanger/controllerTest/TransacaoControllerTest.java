@@ -53,7 +53,8 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andExpect(status().isCreated()));
-        Assertions.assertEquals(transacaoModel, service.save(transacaoRecordDto.transacaoModel()));
+        TransacaoModel transacaoSave = service.save(transacaoRecordDto.transacaoModel());
+        Assertions.assertEquals(transacaoModel, transacaoSave);
     }
 
     @Test
@@ -79,7 +80,8 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andExpect(status().isOk()));
-        Assertions.assertEquals(transacaoModel, service.save(transacaoRecordDto.transacaoModel()));
+        TransacaoModel transacaoSave = service.save(transacaoRecordDto.transacaoModel());
+        Assertions.assertEquals(transacaoModel, transacaoSave);
     }
 
     @Test
@@ -88,10 +90,9 @@ public class TransacaoControllerTest {
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         when(service.findAll()).thenReturn(List.of(transacaoModel));
-        List<TransacaoModel> transacaoModelList = service.findAll();
         mockMvc.perform(get("/")).andExpect(status().isOk());
-        Assertions.assertNotNull(transacaoModelList);
-        Assertions.assertEquals(transacaoModelList, service.findAll());
+        List<TransacaoModel> transacaoFindAll = service.findAll();
+        Assertions.assertNotNull(transacaoFindAll);
     }
 
     @Test
@@ -102,7 +103,8 @@ public class TransacaoControllerTest {
         when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(get("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(Optional.of(transacaoModel), service.findById(transacaoModel.getId()));
+        Optional<TransacaoModel> transacaoFindById = service.findById(transacaoModel.getId());
+        Assertions.assertEquals(Optional.of(transacaoModel), transacaoFindById);
     }
 
     @Test
@@ -113,7 +115,8 @@ public class TransacaoControllerTest {
         when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(delete("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(Optional.of(transacaoModel), service.findById(transacaoModel.getId()));
+        Optional<TransacaoModel> transacaoFindById = service.findById(transacaoModel.getId());
+        Assertions.assertEquals(Optional.of(transacaoModel), transacaoFindById);
     }
 
     //deve testar caso de falha
