@@ -10,10 +10,11 @@ import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,8 +24,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -37,62 +41,69 @@ public class TransacaoControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
-    private TransacaoService service;
+    @Mock
+    private TransacaoService transacaoService;
 
 
     //deve testar caso de sucesso
     @Test
-    public void deveTestarTransacao() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
-                new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-        when(service.save(transacaoModel)).thenReturn(transacaoModel);
-        Assertions.assertNotNull(mockMvc.perform(post("/")
+    public void deveCriarUmaNovaTransacao() throws Exception {
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(
+                new TransacaoModel(UUID.randomUUID(), 1065151L,
+                        new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
+                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
+        mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isCreated()));
-        TransacaoModel transacaoSave = service.save(transacaoRecordDto.transacaoModel());
-        Assertions.assertEquals(transacaoModel, transacaoSave);
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.descricaoModel.status").value("AUTORIZADO"))
+                .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoTestEstorno() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(1065151L, new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.CANCELADO), new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+    public void deveRealizarUmEstorno() throws Exception {
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(
+                new TransacaoModel(1065151L,
+                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
+                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         mockMvc.perform(post("/estorno/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isCreated());
-        Assertions.assertEquals(Status.CANCELADO, transacaoRecordDto.transacaoModel().getDescricaoModel().getStatus());
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.descricaoModel.status").value("CANCELADO"))
+                .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoUpdate() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
-                new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.CANCELADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
-        when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
-        when(service.save(transacaoModel)).thenReturn(transacaoModel);
-        Assertions.assertNotNull(mockMvc.perform(put("/" + transacaoModel.getId())
+    public void deveRealizarUmUpdate() throws Exception {
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(
+                new TransacaoModel(UUID.randomUUID(),1065151L,
+                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
+                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
+        when(transacaoService.findById(transacaoRecordDto.transacaoModel().getId())).thenReturn(Optional.of(transacaoRecordDto.transacaoModel()));
+        mockMvc.perform(put("/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isOk()));
-        TransacaoModel transacaoSave = service.save(transacaoRecordDto.transacaoModel());
-        Assertions.assertEquals(transacaoModel, transacaoSave);
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
     public void deveTestarTransacaoGetAll() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
-                new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        when(service.findAll()).thenReturn(List.of(transacaoModel));
-        mockMvc.perform(get("/")).andExpect(status().isOk());
-        List<TransacaoModel> transacaoFindAll = service.findAll();
-        Assertions.assertNotNull(transacaoFindAll);
+        TransacaoModel transacaoModel =
+                new TransacaoModel(UUID.randomUUID(), 1065151L,
+                        new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
+                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
+        when(transacaoService.findAll()).thenReturn(List.of(transacaoModel));
+        mockMvc.perform(get("/"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
@@ -100,10 +111,10 @@ public class TransacaoControllerTest {
         TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
+        when(transacaoService.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(get("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
-        Optional<TransacaoModel> transacaoFindById = service.findById(transacaoModel.getId());
+        Optional<TransacaoModel> transacaoFindById = transacaoService.findById(transacaoModel.getId());
         Assertions.assertEquals(Optional.of(transacaoModel), transacaoFindById);
     }
 
@@ -112,42 +123,45 @@ public class TransacaoControllerTest {
         TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        when(service.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
+        when(transacaoService.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
         mockMvc.perform(delete("/" + transacaoModel.getId()))
                 .andExpect(status().isOk());
-        Optional<TransacaoModel> transacaoFindById = service.findById(transacaoModel.getId());
+        Optional<TransacaoModel> transacaoFindById = transacaoService.findById(transacaoModel.getId());
         Assertions.assertEquals(Optional.of(transacaoModel), transacaoFindById);
     }
 
     //deve testar caso de falha
     @Test
-    public void deveTestarTransacao_CasoDeFalha() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel();
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+    public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(new TransacaoModel(UUID.randomUUID(), 1065151L,
+                new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.CANCELADO),
+                new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
-                .andExpect(status().isBadRequest());
-        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoUpdate_CasoDeFalha() throws Exception {
-        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
+    public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
-                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+                new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
         mockMvc.perform(put("/" + transacaoRecordDto.transacaoModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto.transacaoModel())))
-                .andExpect(status().isNotFound());
-        Assertions.assertNotNull(transacaoRecordDto);
-        Assertions.assertEquals(transacaoModel, transacaoRecordDto.transacaoModel());
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoGetAll_CasoDeFalha() throws Exception {
+    public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
+        when(transacaoService.findAll()).thenReturn(List.of());
         mockMvc.perform(get("/"))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
@@ -158,18 +172,20 @@ public class TransacaoControllerTest {
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         mockMvc.perform(get("/" + transacaoModel.getId()))
-                .andExpect(status().isNotFound());
-        Assertions.assertNotEquals(200, 404);
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoDelete_CasoDeFalha() throws Exception {
+    public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
         TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
         mockMvc.perform(delete("/" + transacaoModel.getId()))
-                .andExpect(status().isNotFound());
-        Assertions.assertNotEquals(200, 404);
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andReturn();
     }
 
 }
