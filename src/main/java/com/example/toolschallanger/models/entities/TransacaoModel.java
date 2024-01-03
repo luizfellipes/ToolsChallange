@@ -1,5 +1,7 @@
 package com.example.toolschallanger.models.entities;
 
+import com.example.toolschallanger.models.dtos.DescricaoRecordDTO;
+import com.example.toolschallanger.models.dtos.FormaPagamentoRecordDTO;
 import jakarta.persistence.*;
 
 import java.io.Serial;
