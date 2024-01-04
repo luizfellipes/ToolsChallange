@@ -1,5 +1,8 @@
 package com.example.toolschallanger.ServiceTest;
 
+import com.example.toolschallanger.models.dtos.DescricaoRecordDTO;
+import com.example.toolschallanger.models.dtos.FormaPagamentoRecordDTO;
+import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
@@ -25,38 +28,31 @@ public class TransacaoServiceTest {
     //Caso de sucesso
     @Test
     public void deveTestarSave() {
-        TransacaoModel transacaoModel = (
-                new TransacaoModel(1065151L,
-                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
-                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-        TransacaoModel trasacaoSave = transacaoService.save(transacaoModel);
-        Assertions.assertEquals(transacaoModel, trasacaoSave);
+        TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(1065151L, new DescricaoRecordDTO(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop"),
+                new FormaPagamentoRecordDTO(FormaPagamento.AVISTA, 1));
+        TransacaoModel transacaoSave = transacaoService.save(transacaoRecordDto);
+        Assertions.assertEquals(transacaoRecordDto, transacaoSave.toString());
     }
 
     @Test
     public void deveTestarEstorno() {
-        TransacaoModel transacaoModel = (
-                new TransacaoModel(1065151L,
-                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.AUTORIZADO),
-                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-        transacaoService.estorno(transacaoModel);
-        Assertions.assertEquals(Status.CANCELADO, transacaoModel.getDescricaoModel().getStatus());
+        TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(1065151L,
+                new DescricaoRecordDTO(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop"),
+                new FormaPagamentoRecordDTO(FormaPagamento.AVISTA, 1));
+        Assertions.assertEquals(Status.CANCELADO, transacaoService.estorno(transacaoRecordDto).getDescricaoModel().getStatus());
     }
 
     //Caso de falha
     @Test
     public void deveTestarSave_EmCasoDeFalha() {
-        TransacaoModel transacaoModel = new TransacaoModel();
-        Assertions.assertThrows(RuntimeException.class, ()-> transacaoService.save(transacaoModel));
+        TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(null, null, null);
+        Assertions.assertThrows(RuntimeException.class, ()-> transacaoService.save(transacaoRecordDto));
     }
 
     @Test
     public void deveTestarEstorno_EmCasoDeFalha() {
-        TransacaoModel transacaoModel = (
-                new TransacaoModel(1065151L,
-                        new DescricaoModel(500.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.000, Status.CANCELADO),
-                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.estorno(transacaoModel));
+        TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(null, null, null);
+        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.estorno(transacaoRecordDto));
     }
 
 }
