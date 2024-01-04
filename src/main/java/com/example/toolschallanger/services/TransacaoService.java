@@ -9,6 +9,7 @@ import com.example.toolschallanger.repositories.TransacaoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,13 +25,17 @@ public class TransacaoService {
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
-        return transacaoRepository.save(new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel()));
+        TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
+        transacaoModel.getDescricaoModel().geraValoresAutomatico();
+        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
+        return transacaoRepository.save(transacaoModel);
     }
 
     public TransacaoModel estorno(TransacaoRecordDTO transacaoRecordDTO) {
-        if (converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel().getStatus() == Status.AUTORIZADO) {
-            converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel().setStatus(Status.CANCELADO);
-            return transacaoRepository.save(new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel()));
+        if (converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel().getStatus() != Status.CANCELADO) {
+            TransacaoModel transcaoEstornada = new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
+            transcaoEstornada.getDescricaoModel().setStatus(Status.CANCELADO);
+            return transacaoRepository.save(transcaoEstornada);
         } else {
             throw new RuntimeException("Não é possivel estornar uma transação diferente de AUTORIZADO !");
         }
@@ -48,11 +53,9 @@ public class TransacaoService {
         transacaoRepository.deleteById(id);
     }
 
-    public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO){
+    public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
         DescricaoModel descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoRecordDTO().valor(), transacaoRecordDTO.descricaoRecordDTO().dataHora(), transacaoRecordDTO.descricaoRecordDTO().estabelecimento());
         FormaPagamentoModel formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaPagamentoRecordDTO().tipo(), transacaoRecordDTO.formaPagamentoRecordDTO().parcelas());
-        descricaoModel.geraValoresAutomatico();
-        formaPagamentoModel.validaParcela(descricaoModel.getValor());
         return new TransacaoModel(transacaoRecordDTO.cartao(), descricaoModel, formaPagamentoModel);
     }
 }
