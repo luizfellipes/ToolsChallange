@@ -31,7 +31,7 @@ public class TransacaoController {
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> save(@RequestBody @Validated TransacaoRecordDTO transacaoRecordDto) {
-        if (transacaoRecordDto != null) {
+        if (transacaoRecordDto.descricaoRecordDTO() != null && transacaoRecordDto.formaPagamentoRecordDTO() != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
