@@ -1,30 +1,33 @@
 package com.example.toolschallanger.controller;
 
 import com.example.toolschallanger.models.dtos.TransacaoRecordDto;
+import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
-import com.example.toolschallanger.models.entities.TransacaoModel;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-
-@RestController
 @CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/transacoes")
 public class TransacaoController {
 
-    @Autowired
-    TransacaoService transacaoService;
+    private final TransacaoService transacaoService;
 
-    @PostMapping("/")
+    public TransacaoController(TransacaoService transacaoService) {
+        this.transacaoService = transacaoService;
+    }
+
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
+    @PostMapping
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDto transacaoRecordDto) {
         if (transacaoRecordDto.transacaoModel().getDescricaoModel().getStatus() == Status.CANCELADO){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

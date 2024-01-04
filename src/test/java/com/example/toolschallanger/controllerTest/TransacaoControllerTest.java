@@ -1,5 +1,6 @@
 package com.example.toolschallanger.controllerTest;
 
+import com.example.toolschallanger.controller.TransacaoController;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDto;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
@@ -8,52 +9,59 @@ import com.example.toolschallanger.models.enuns.FormaPagamento;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.stubbing.OngoingStubbing;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
 public class TransacaoControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-    @Autowired
     private ObjectMapper objectMapper;
-    @Mock
     private TransacaoService transacaoService;
+    private TransacaoController transacaoController;
 
+    @BeforeEach
+    public void setUp(){
+        this.transacaoService = mock(TransacaoService.class);
+        this.transacaoController = new TransacaoController(transacaoService);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.objectMapper = new ObjectMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerModule(new JavaTimeModule());
+    }
 
     //deve testar caso de sucesso
     @Test
     public void deveCriarUmaNovaTransacao() throws Exception {
-        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(
-                new TransacaoModel(UUID.randomUUID(), 1065151L,
-                        new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
-                        new FormaPagamentoModel(FormaPagamento.AVISTA, 1)));
-        mockMvc.perform(post("/")
-                        .contentType(MediaType.APPLICATION_JSON)
+        TransacaoModel transacaoModel = new TransacaoModel(UUID.randomUUID(), 1065151L,
+                new DescricaoModel(50.00, LocalDateTime.now(), "PetShop", 0000.1111, 00000.010, Status.AUTORIZADO),
+                new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
+        TransacaoRecordDto transacaoRecordDto = new TransacaoRecordDto(transacaoModel);
+
+        when(transacaoService.save(any())).thenReturn(transacaoModel);
+
+        mockMvc.perform(post("/transacoes")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(transacaoRecordDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
