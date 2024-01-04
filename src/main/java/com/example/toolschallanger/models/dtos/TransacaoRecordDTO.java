@@ -1,6 +1,5 @@
 package com.example.toolschallanger.models.dtos;
 
-import com.example.toolschallanger.models.entities.TransacaoModel;
 import jakarta.validation.constraints.NotNull;
 
 

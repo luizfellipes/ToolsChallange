@@ -6,10 +6,10 @@ import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
