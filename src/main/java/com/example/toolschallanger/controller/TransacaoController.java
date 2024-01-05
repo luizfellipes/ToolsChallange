@@ -6,31 +6,27 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 
-@RestController
-@RequestMapping
 @CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/transacoes")
 public class TransacaoController {
 
-    //@Autowired
     private final TransacaoService transacaoService;
 
     public TransacaoController(TransacaoService transacaoService) {
         this.transacaoService = transacaoService;
     }
 
-
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
-    public ResponseEntity<TransacaoModel> save(@RequestBody @Validated TransacaoRecordDTO transacaoRecordDto) {
+    @PostMapping
+    public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
         if (transacaoRecordDto.descricaoRecordDTO() != null && transacaoRecordDto.formaPagamentoRecordDTO() != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
         }
@@ -40,7 +36,10 @@ public class TransacaoController {
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> estorno(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
+        if (transacaoRecordDto.descricaoRecordDTO() != null && transacaoRecordDto.formaPagamentoRecordDTO() != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @GetMapping

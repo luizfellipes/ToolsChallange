@@ -33,7 +33,9 @@ public class TransacaoService {
 
     public TransacaoModel estorno(TransacaoRecordDTO transacaoRecordDTO) {
         if (converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel().getStatus() != Status.CANCELADO) {
-            TransacaoModel transcaoEstornada = new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
+            TransacaoModel transcaoEstornada = new TransacaoModel(transacaoRecordDTO.cartao(),
+                    converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(),
+                    converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
             transcaoEstornada.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transcaoEstornada);
         } else {
