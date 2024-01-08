@@ -17,7 +17,6 @@ import java.util.UUID;
 @Service
 public class TransacaoService {
 
-    //@Autowired
     private final TransacaoRepository transacaoRepository;
 
     public TransacaoService(TransacaoRepository transacaoRepository) {
@@ -25,19 +24,17 @@ public class TransacaoService {
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(), converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(), converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
+        TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
         transacaoModel.getDescricaoModel().geraValoresAutomatico();
         transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
         return transacaoRepository.save(transacaoModel);
     }
 
     public TransacaoModel estorno(TransacaoRecordDTO transacaoRecordDTO) {
-        if (converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel().getStatus() != Status.CANCELADO) {
-            TransacaoModel transcaoEstornada = new TransacaoModel(transacaoRecordDTO.cartao(),
-                    converterDtoEmEntity(transacaoRecordDTO).getDescricaoModel(),
-                    converterDtoEmEntity(transacaoRecordDTO).getFormaPagamentoModel());
-            transcaoEstornada.getDescricaoModel().setStatus(Status.CANCELADO);
-            return transacaoRepository.save(transcaoEstornada);
+        TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
+        if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
+            transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
+            return transacaoRepository.save(transacaoParaEstornar);
         } else {
             throw new RuntimeException("Não é possivel estornar uma transação diferente de AUTORIZADO !");
         }
