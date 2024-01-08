@@ -1,17 +1,14 @@
-package com.example.toolschallanger.ServiceTest;
+package com.example.toolschallanger.Service;
 
 import com.example.toolschallanger.models.dtos.DescricaoRecordDTO;
 import com.example.toolschallanger.models.dtos.FormaPagamentoRecordDTO;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
-import com.example.toolschallanger.models.entities.DescricaoModel;
-import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.FormaPagamento;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
