@@ -1,4 +1,4 @@
-package com.example.toolschallanger.entitiesTest;
+package com.example.toolschallanger.entities;
 
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
