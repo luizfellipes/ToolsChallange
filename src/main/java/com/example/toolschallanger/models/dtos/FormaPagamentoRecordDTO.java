@@ -1,7 +1,9 @@
 package com.example.toolschallanger.models.dtos;
 
 import com.example.toolschallanger.models.enuns.FormaPagamento;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-public record FormaPagamentoRecordDTO(@NotNull FormaPagamento tipo, Integer parcelas) {
+
+public record FormaPagamentoRecordDTO(@NotBlank FormaPagamento tipo,
+                                      @NotBlank Integer parcelas) {
 }

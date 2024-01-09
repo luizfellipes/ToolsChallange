@@ -27,19 +27,13 @@ public class TransacaoController {
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     @PostMapping
     public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
-        if (transacaoRecordDto.descricaoRecordDTO() != null && transacaoRecordDto.formaPagamentoRecordDTO() != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
     }
 
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> estorno(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
-        if (transacaoRecordDto.descricaoRecordDTO() != null && transacaoRecordDto.formaPagamentoRecordDTO() != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
     }
 
     @GetMapping
