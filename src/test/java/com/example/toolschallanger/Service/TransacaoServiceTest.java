@@ -15,20 +15,27 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
+import static com.example.toolschallanger.Mocks.MocksDTO.responseMockDTO;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class TransacaoServiceTest {
 
     @Autowired
-    TransacaoService transacaoService;
+    private TransacaoService transacaoService;
 
     //Caso de sucesso
     @Test
     public void deveTestarSave() {
-        TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(1065151L, new DescricaoRecordDTO(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop"),
-                new FormaPagamentoRecordDTO(FormaPagamento.AVISTA, 1));
-        TransacaoModel transacaoSave = transacaoService.save(transacaoRecordDto);
-        Assertions.assertEquals(transacaoRecordDto, transacaoSave.toString());
+        TransacaoModel savedTransacaoModel = transacaoService.save(responseMockDTO());
+        TransacaoRecordDTO savedTransacaoRecordDto = new TransacaoRecordDTO(
+                savedTransacaoModel.getCartao(),
+                new DescricaoRecordDTO(savedTransacaoModel.getDescricaoModel().getValor(),
+                        savedTransacaoModel.getDescricaoModel().getDataHora(),
+                        savedTransacaoModel.getDescricaoModel().getEstabelecimento()),
+                new FormaPagamentoRecordDTO(savedTransacaoModel.getFormaPagamentoModel().getTipo(),
+                        savedTransacaoModel.getFormaPagamentoModel().getParcelas()));
+        Assertions.assertEquals(responseMockDTO(), savedTransacaoRecordDto);
     }
 
     @Test
@@ -43,7 +50,7 @@ public class TransacaoServiceTest {
     @Test
     public void deveTestarSave_EmCasoDeFalha() {
         TransacaoRecordDTO transacaoRecordDto = new TransacaoRecordDTO(null, null, null);
-        Assertions.assertThrows(RuntimeException.class, ()-> transacaoService.save(transacaoRecordDto));
+        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.save(transacaoRecordDto));
     }
 
     @Test

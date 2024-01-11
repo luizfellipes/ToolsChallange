@@ -7,9 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -26,13 +30,28 @@ public class TransacaoController {
 
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     @PostMapping
-    public ResponseEntity<TransacaoModel> save(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
+    public ResponseEntity<Object> save(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto, BindingResult campo) {
+        if (campo.hasErrors()) {
+            Map<String, String> erros = new HashMap<>();
+            for (FieldError erro : campo.getFieldErrors()) {
+                erros.put(erro.getField(), erro.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(erros);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
     }
 
+
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
-    public ResponseEntity<TransacaoModel> estorno(@RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
+    public ResponseEntity<Object> estorno(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto, BindingResult campo) {
+        if (campo.hasErrors()) {
+            Map<String, String> erros = new HashMap<>();
+            for (FieldError erro : campo.getFieldErrors()) {
+                erros.put(erro.getField(), erro.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(erros);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
     }
 
@@ -72,6 +91,5 @@ public class TransacaoController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.save(transacaoRecordDto));
     }
-
 
 }

@@ -1,10 +1,14 @@
 package com.example.toolschallanger.models.dtos;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 
-public record TransacaoRecordDTO(@NotBlank @NotNull Long cartao,
-                                 @NotBlank DescricaoRecordDTO descricaoRecordDTO,
-                                 @NotBlank FormaPagamentoRecordDTO formaPagamentoRecordDTO) {
+public record TransacaoRecordDTO(
+        @NotNull(message = "O campo 'cartao' não pode ser nulo ou vazio")
+        Long cartao,
+        @Valid
+        DescricaoRecordDTO descricaoRecordDTO,
+        @Valid
+        FormaPagamentoRecordDTO formaPagamentoRecordDTO) {
 }

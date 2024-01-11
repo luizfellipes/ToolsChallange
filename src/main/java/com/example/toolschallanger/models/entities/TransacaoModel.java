@@ -1,7 +1,7 @@
 package com.example.toolschallanger.models.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,7 +17,7 @@ public class TransacaoModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @NotBlank(message = "O Cartão não pode ser vazio ou nulo")
+    @NotNull(message = "O Cartão não pode ser vazio ou nulo")
     private Long cartao;
     @Embedded
     private DescricaoModel descricaoModel;
@@ -71,4 +71,6 @@ public class TransacaoModel implements Serializable {
     public void setFormaPagamentoModel(FormaPagamentoModel formaPagamentoModel) {
         this.formaPagamentoModel = formaPagamentoModel;
     }
+
+
 }

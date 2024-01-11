@@ -1,7 +1,6 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -150,7 +149,7 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Optional.empty())))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
