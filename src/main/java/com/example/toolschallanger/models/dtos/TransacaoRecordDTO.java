@@ -8,7 +8,7 @@ public record TransacaoRecordDTO(
         @NotNull(message = "O campo 'cartao' não pode ser nulo ou vazio")
         Long cartao,
         @Valid
-        DescricaoRecordDTO descricaoRecordDTO,
+        DescricaoRecordDTO descricaoDePagamento,
         @Valid
-        FormaPagamentoRecordDTO formaPagamentoRecordDTO) {
+        FormaPagamentoRecordDTO formaDePagamento) {
 }
