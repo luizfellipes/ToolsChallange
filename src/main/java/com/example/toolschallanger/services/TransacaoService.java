@@ -7,12 +7,14 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TransacaoService {
@@ -41,20 +43,44 @@ public class TransacaoService {
     }
 
     public List<TransacaoModel> findAll() {
-        return transacaoRepository.findAll();
+        if (!transacaoRepository.findAll().isEmpty()) {
+            return transacaoRepository.findAll();
+        } else {
+            throw new RuntimeException("Não existe transações na base !");
+        }
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
-        return transacaoRepository.findById(id);
+        if (transacaoRepository.existsById(id)) {
+            return transacaoRepository.findById(id);
+        } else {
+            throw new RuntimeException("O ID selecionado não existe !");
+        }
     }
 
-    public void deleteById(UUID id) {
-        transacaoRepository.deleteById(id);
+    public Object deleteById(UUID id) {
+        if (transacaoRepository.findById(id).isEmpty()) {
+            throw new RuntimeException("O ID selecionado não existe !");
+        } else {
+            transacaoRepository.deleteById(id);
+            return true;
+        }
+    }
+
+    public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
+        if (transacaoRepository.existsById(id)) {
+            TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
+            transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoRecordDTO.descricaoDePagamento().valor());
+            return transacaoRepository.save(transacaoParaAtualizar);
+        } else {
+            throw new RuntimeException("Id não encontrado !");
+        }
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        DescricaoModel descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoRecordDTO().valor(), transacaoRecordDTO.descricaoRecordDTO().dataHora(), transacaoRecordDTO.descricaoRecordDTO().estabelecimento());
-        FormaPagamentoModel formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaPagamentoRecordDTO().tipo(), transacaoRecordDTO.formaPagamentoRecordDTO().parcelas());
+        DescricaoModel descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento());
+        FormaPagamentoModel formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas());
         return new TransacaoModel(transacaoRecordDTO.cartao(), descricaoModel, formaPagamentoModel);
     }
+
 }

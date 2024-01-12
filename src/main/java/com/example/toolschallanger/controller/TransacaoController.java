@@ -7,13 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -30,66 +26,38 @@ public class TransacaoController {
 
     @Operation(summary = "Criar", description = "Salvar novas transações", tags = "Transações")
     @PostMapping
-    public ResponseEntity<Object> save(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto, BindingResult campo) {
-        if (campo.hasErrors()) {
-            Map<String, String> erros = new HashMap<>();
-            for (FieldError erro : campo.getFieldErrors()) {
-                erros.put(erro.getField(), erro.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(erros);
-        }
+    public ResponseEntity<TransacaoModel> save(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.save(transacaoRecordDto));
     }
 
-
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
-    public ResponseEntity<Object> estorno(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto, BindingResult campo) {
-        if (campo.hasErrors()) {
-            Map<String, String> erros = new HashMap<>();
-            for (FieldError erro : campo.getFieldErrors()) {
-                erros.put(erro.getField(), erro.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(erros);
-        }
+    public ResponseEntity<Object> estorno(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
     }
 
     @GetMapping
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
     public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
-        if (!transacaoService.findAll().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
     public ResponseEntity<Object> getOneTransacao(@PathVariable(value = "id") UUID id) {
-        return transacaoService.findById(id).<ResponseEntity<Object>>map(model -> ResponseEntity.status(HttpStatus.OK).body(model))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !"));
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findById(id));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
     public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
-        if (transacaoService.findById(id).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !");
-        } else {
-            transacaoService.deleteById(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Transação deletada com sucesso !");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.deleteById(id));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
     public ResponseEntity<Object> updateTransacao(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
-        if (transacaoService.findById(id).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transação não encontrada !");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.save(transacaoRecordDto));
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 
 }
