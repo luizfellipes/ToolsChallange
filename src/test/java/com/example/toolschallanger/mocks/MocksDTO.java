@@ -1,4 +1,4 @@
-package com.example.toolschallanger.Mocks;
+package com.example.toolschallanger.mocks;
 
 import com.example.toolschallanger.models.dtos.DescricaoRecordDTO;
 import com.example.toolschallanger.models.dtos.FormaPagamentoRecordDTO;
@@ -13,6 +13,10 @@ public abstract class MocksDTO {
         return new TransacaoRecordDTO(1065151L,
                 new DescricaoRecordDTO(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop"),
                 new FormaPagamentoRecordDTO(FormaPagamento.AVISTA, 1));
+    }
+
+    public static TransacaoRecordDTO requestMockNullDTO(){
+       return new TransacaoRecordDTO(null, null, null);
     }
 
     public static TransacaoRecordDTO responseMockDTO() {
