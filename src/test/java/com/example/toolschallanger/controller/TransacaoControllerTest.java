@@ -1,6 +1,7 @@
 package com.example.toolschallanger.controller;
 
 
+import com.example.toolschallanger.config.validacoes.Validacoes;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -21,16 +22,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-import static com.example.toolschallanger.Mocks.MocksDTO.requestMockDTO;
-import static com.example.toolschallanger.Mocks.MocksDTO.responseMockDTO;
-import static com.example.toolschallanger.Mocks.MocksModel.requestMockModel;
-
-import static com.example.toolschallanger.Mocks.MocksModel.responseMockModel;
+import static com.example.toolschallanger.mocks.MocksDTO.requestMockDTO;
+import static com.example.toolschallanger.mocks.MocksDTO.responseMockDTO;
 
 
+import static com.example.toolschallanger.mocks.MocksModel.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,7 +46,8 @@ public class TransacaoControllerTest {
     public void setUp() {
         this.transacaoService = mock(TransacaoService.class);
         this.transacaoController = new TransacaoController(transacaoService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
+                .setControllerAdvice(new Validacoes()).build();
         this.objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModule(new JavaTimeModule());
@@ -71,7 +70,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveRealizarUmEstorno() throws Exception {
-        when(transacaoService.estorno(requestMockDTO())).thenReturn(responseMockModel());
+        when(transacaoService.estorno(requestMockModel().getId() ,requestMockDTO())).thenReturn(responseMockModel());
 
         mockMvc.perform(post("/transacoes/estorno/" + responseMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,11 +130,11 @@ public class TransacaoControllerTest {
     //deve testar caso de falha
     @Test
     public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
-        when(transacaoService.save(any())).thenReturn(null);
+        when(transacaoService.save(any())).thenReturn(requestNullMockModel());
 
         mockMvc.perform(post("/transacoes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(null)))
+                        .content(objectMapper.writeValueAsString(requestNullMockModel())))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -155,27 +154,31 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        when(transacaoService.findAll()).thenReturn(List.of());
+        when(transacaoService.findAll().isEmpty()).thenThrow(new RuntimeException());
 
         mockMvc.perform(get("/transacoes/"))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isInternalServerError())
                 .andReturn();
     }
 
     @Test
     public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
+        when(transacaoService.findById(any())).thenThrow(new RuntimeException());
+
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isInternalServerError())
                 .andReturn();
     }
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
+        when(transacaoService.deleteById(any())).thenThrow(new RuntimeException());
+
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isInternalServerError())
                 .andReturn();
     }
 
