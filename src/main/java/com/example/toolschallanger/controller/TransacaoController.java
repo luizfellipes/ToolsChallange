@@ -32,8 +32,8 @@ public class TransacaoController {
 
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
-    public ResponseEntity<Object> estorno(@Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(transacaoRecordDto));
+    public ResponseEntity<Object> estorno(@PathVariable(value = "id") UUID id, @Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(id, transacaoRecordDto));
     }
 
     @GetMapping

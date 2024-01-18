@@ -7,11 +7,8 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 
 import java.util.*;
@@ -32,13 +29,13 @@ public class TransacaoService {
         return transacaoRepository.save(transacaoModel);
     }
 
-    public TransacaoModel estorno(TransacaoRecordDTO transacaoRecordDTO) {
+    public TransacaoModel estorno(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
-        if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
+        if (findById(id).isPresent() && transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
-            throw new RuntimeException("Não é possivel estornar uma transação diferente de AUTORIZADO !");
+            throw new RuntimeException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
         }
     }
 
@@ -46,7 +43,7 @@ public class TransacaoService {
         if (!transacaoRepository.findAll().isEmpty()) {
             return transacaoRepository.findAll();
         } else {
-            throw new RuntimeException("Não existe transações na base !");
+            throw new RuntimeException("Não foi possivel realizar uma busca na base: não existem transações registradas !");
         }
     }
 
@@ -54,13 +51,13 @@ public class TransacaoService {
         if (transacaoRepository.existsById(id)) {
             return transacaoRepository.findById(id);
         } else {
-            throw new RuntimeException("O ID selecionado não existe !");
+            throw new RuntimeException("Não existe transação com o ID informado !");
         }
     }
 
     public Object deleteById(UUID id) {
-        if (transacaoRepository.findById(id).isEmpty()) {
-            throw new RuntimeException("O ID selecionado não existe !");
+        if (findById(id).isEmpty()) {
+            throw new RuntimeException("Não foi possivel realizar a exclusão pois ID selecionado já foi excluido ou não existe !");
         } else {
             transacaoRepository.deleteById(id);
             return true;
@@ -70,17 +67,18 @@ public class TransacaoService {
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         if (transacaoRepository.existsById(id)) {
             TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
-            transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoRecordDTO.descricaoDePagamento().valor());
+            transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoParaAtualizar.getDescricaoModel().getValor());
             return transacaoRepository.save(transacaoParaAtualizar);
         } else {
-            throw new RuntimeException("Id não encontrado !");
+            throw new RuntimeException("Não foi possivel realizar um update: Id não encontrado !");
         }
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        DescricaoModel descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento());
-        FormaPagamentoModel formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas());
-        return new TransacaoModel(transacaoRecordDTO.cartao(), descricaoModel, formaPagamentoModel);
+        return new TransacaoModel(transacaoRecordDTO.cartao(),
+                new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
+                new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
+
     }
 
 }
