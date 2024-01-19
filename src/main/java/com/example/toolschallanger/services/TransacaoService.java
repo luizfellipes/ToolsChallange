@@ -57,12 +57,9 @@ public class TransacaoService {
     }
 
     public Object deleteById(UUID id) {
-        if (findById(id).isEmpty()) {
-            throw new RuntimeException("Não foi possivel realizar a exclusão pois ID selecionado já foi excluido ou não existe !");
-        } else {
-            transacaoRepository.deleteById(id);
-            return true;
-        }
+        findById(id).orElseThrow(() -> new RuntimeException("Não foi possivel realizar a exclusão pois ID selecionado já foi excluido ou não existe !"));
+        transacaoRepository.deleteById(id);
+        return ("O seguinte ID: ") + id + (" foi excluido com sucesso !");
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
@@ -71,9 +68,9 @@ public class TransacaoService {
         transacaoExistente.get().getFormaPagamentoModel().validaParcela(transacaoExistente.get().getDescricaoModel().getValor());
         return transacaoRepository.save(
                 new TransacaoModel(id, transacaoRecordDTO.cartao(),
-                new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento(),
-                        transacaoExistente.get().getDescricaoModel().getNsu(), transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao(), transacaoExistente.get().getDescricaoModel().getStatus()),
-                new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas())));
+                        new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento(),
+                                transacaoExistente.get().getDescricaoModel().getNsu(), transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao(), transacaoExistente.get().getDescricaoModel().getStatus()),
+                        new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas())));
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
