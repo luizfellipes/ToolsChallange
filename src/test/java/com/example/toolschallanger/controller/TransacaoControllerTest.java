@@ -70,11 +70,11 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveRealizarUmEstorno() throws Exception {
-        when(transacaoService.estorno(requestMockModel().getId() ,requestMockDTO())).thenReturn(responseMockModel());
+        when(transacaoService.estorno(any(), any())).thenReturn(responseMockModel());
 
-        mockMvc.perform(post("/transacoes/estorno/" + responseMockModel().getId())
+        mockMvc.perform(post("/transacoes/estorno/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestMockDTO())))
+                        .content(objectMapper.writeValueAsString(responseMockModel())))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.descricaoModel.status").value("CANCELADO"))
