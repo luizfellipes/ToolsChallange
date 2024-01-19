@@ -32,6 +32,7 @@ public class TransacaoService {
     public TransacaoModel estorno(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
         if (findById(id).isPresent() && transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
+            transacaoParaEstornar.setId(id);
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
@@ -65,13 +66,14 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        if (transacaoRepository.existsById(id)) {
-            TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
-            transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoParaAtualizar.getDescricaoModel().getValor());
-            return transacaoRepository.save(transacaoParaAtualizar);
-        } else {
-            throw new RuntimeException("Não foi possivel realizar um update: Id não encontrado !");
-        }
+        findById(id).orElseThrow(() -> new RuntimeException("Não foi possível realizar um update: Id não encontrado !"));
+        Optional<TransacaoModel> transacaoExistente = findById(id);
+        transacaoExistente.get().getFormaPagamentoModel().validaParcela(transacaoExistente.get().getDescricaoModel().getValor());
+        return transacaoRepository.save(
+                new TransacaoModel(id, transacaoRecordDTO.cartao(),
+                new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento(),
+                        transacaoExistente.get().getDescricaoModel().getNsu(), transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao(), transacaoExistente.get().getDescricaoModel().getStatus()),
+                new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas())));
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
