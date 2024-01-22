@@ -3,13 +3,13 @@ package com.example.toolschallanger.models.entities;
 import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
 
-
 import java.time.LocalDateTime;
+
 
 
 //@Entity
 //@Table(name = "TB_DESCRICAO")
-public class DescricaoModel {
+public class DescricaoModel  {
 
     private Double valor;
     private LocalDateTime dataHora;

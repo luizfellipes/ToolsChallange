@@ -32,9 +32,12 @@ public class TransacaoService {
     public TransacaoModel estorno(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
         if (findById(id).isPresent() && transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
-            transacaoParaEstornar.setId(id);
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
-            return transacaoRepository.save(transacaoParaEstornar);
+            return transacaoRepository.save(
+                    new TransacaoModel(id, transacaoParaEstornar.getCartao(),
+                            new DescricaoModel(transacaoParaEstornar.getDescricaoModel().getValor(), transacaoParaEstornar.getDescricaoModel().getDataHora(), transacaoParaEstornar.getDescricaoModel().getEstabelecimento(),
+                                    transacaoParaEstornar.getDescricaoModel().getNsu(), transacaoParaEstornar.getDescricaoModel().getCodigoAutorizacao(), transacaoParaEstornar.getDescricaoModel().getStatus()),
+                            new FormaPagamentoModel(transacaoParaEstornar.getFormaPagamentoModel().getTipo(), transacaoParaEstornar.getFormaPagamentoModel().getParcelas())));
         } else {
             throw new RuntimeException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
         }

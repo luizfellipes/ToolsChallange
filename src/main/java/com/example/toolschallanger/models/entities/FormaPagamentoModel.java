@@ -2,8 +2,8 @@ package com.example.toolschallanger.models.entities;
 
 
 import com.example.toolschallanger.models.enuns.FormaPagamento;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
+
 
 //@Entity
 //@Table(name = "TB_FORMA_PAGAMENTO")

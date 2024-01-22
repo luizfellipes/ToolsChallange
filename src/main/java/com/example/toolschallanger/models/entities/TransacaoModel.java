@@ -60,16 +60,8 @@ public class TransacaoModel implements Serializable {
         return descricaoModel;
     }
 
-    public void setDescricaoModel(DescricaoModel descricaoModel) {
-        this.descricaoModel = descricaoModel;
-    }
-
     public FormaPagamentoModel getFormaPagamentoModel() {
         return formaPagamentoModel;
-    }
-
-    public void setFormaPagamentoModel(FormaPagamentoModel formaPagamentoModel) {
-        this.formaPagamentoModel = formaPagamentoModel;
     }
 
 
