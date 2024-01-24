@@ -6,9 +6,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 
+
 //@Entity
 //@Table(name = "TB_DESCRICAO")
-public class DescricaoModel {
+public class DescricaoModel  {
 
     private Double valor;
     private LocalDateTime dataHora;
@@ -19,6 +20,12 @@ public class DescricaoModel {
     private Status status;
 
     public DescricaoModel() {
+    }
+
+    public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento) {
+        this.valor = valor;
+        this.dataHora = dataHora;
+        this.estabelecimento = estabelecimento;
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -54,21 +61,6 @@ public class DescricaoModel {
         return status;
     }
 
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
-
-    public void setNsu(Double nsu) {
-        this.nsu = nsu;
-    }
-
-    public void setCodigoAutorizacao(Double codigoAutorizacao) {
-        this.codigoAutorizacao = codigoAutorizacao;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     public void geraNsuValido() {
         if (this.valor <= 0) {
