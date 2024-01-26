@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.toolschallanger.mocks.MocksDTO.requestMockDTO;
 import static com.example.toolschallanger.mocks.MocksDTO.responseMockDTO;
 
 import static com.example.toolschallanger.mocks.MocksModel.*;
@@ -78,7 +79,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveRealizarUmUpdate() throws Exception {
-        when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+        when(transacaoService.updateById(any(), any())).thenReturn(responseMockModel());
 
         mockMvc.perform(put("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -112,7 +113,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoDelete() throws Exception {
-        when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+        when(transacaoService.deleteById(any())).thenReturn(Optional.of(requestMockModel()));
 
         mockMvc.perform(delete("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +138,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.findById(any())).thenReturn(Optional.empty());
+        when(transacaoService.updateById(any(), any())).thenThrow(new RuntimeException());
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
