@@ -8,6 +8,7 @@
 (c) modelo de post e response:
 
 Post:
+
 ~~~
 {
     "cartao": 1424214,
@@ -22,7 +23,9 @@ Post:
     }
 }
 ~~~ 
+
 Response:
+
 ~~~
 {
 	"id": "7d968765-8d6d-4740-9912-2ee08304954c",
@@ -41,7 +44,9 @@ Response:
 	}
 }
 ~~~
+
 Estorno:
+
 ~~~
 {
 	"id": "0aeb7540-274e-4c9c-8f13-aa62643646a6",
@@ -62,15 +67,16 @@ Estorno:
 ~~~
 
 <h3>Iniciando...</h3>
+
 - jdk17
-- https://github.com/luizfellipes/ToolsChallange.git
-- baixar todas as dependencias solicitada no pom.xml
-- Banco de Dados Relacional em memoria H2
+- https://github.com/luizfellipes/ToolsChallange.git<br>
+- baixar todas as dependencias solicitada no pom.xml<br>
+- Banco de Dados Relacional em memoria H2<br>
 - Swagger http://localhost:8080/swagger-ui/index.html#/
 
 <h3>Executando a aplicação</h3>
 
-Como se trata de uma aplicação teste rode ela pela classe SpringApplication.run, compile ou execute o Dockerfile.
+Como se trata de uma aplicação teste rode ela pela classe SpringApplication.run, compile ou execute o Dockerfile.<br>
 
 docker build -t toolschallange .<br>
 docker run -p 8080:8080 toolschallange
