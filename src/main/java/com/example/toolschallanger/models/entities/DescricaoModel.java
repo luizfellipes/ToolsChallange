@@ -61,6 +61,9 @@ public class DescricaoModel  {
         return status;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public void geraNsuValido() {
         if (this.valor <= 0) {

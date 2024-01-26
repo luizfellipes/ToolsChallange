@@ -48,6 +48,10 @@ public class TransacaoModel implements Serializable {
         return cartao;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public DescricaoModel getDescricaoModel() {
         return descricaoModel;
     }
