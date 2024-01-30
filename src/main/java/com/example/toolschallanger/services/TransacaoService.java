@@ -30,8 +30,9 @@ public class TransacaoService {
     }
 
     public TransacaoModel estorno(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
+        findById(id);
         TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
-        if (findById(id).isPresent() && transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
+        if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
             transacaoParaEstornar.setId(id);
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
@@ -49,29 +50,23 @@ public class TransacaoService {
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
-        if (transacaoRepository.existsById(id)) {
-            return transacaoRepository.findById(id);
-        } else {
-            throw new RuntimeException("Não existe transação com o ID informado !");
-        }
+        return Optional.ofNullable(transacaoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID informado !")));
     }
 
     public Object deleteById(UUID id) {
-        findById(id).orElseThrow(() -> new RuntimeException("Não foi possivel realizar a exclusão pois ID selecionado já foi excluido ou não existe !"));
+        findById(id);
         transacaoRepository.deleteById(id);
         return ("O seguinte ID: ") + id + (" foi excluido com sucesso !");
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        if (findById(id).isPresent()) {
-            TransacaoModel transacaoExistente = converterDtoEmEntity(transacaoRecordDTO);
-            transacaoExistente.setId(id);
-            transacaoExistente.getFormaPagamentoModel().validaParcela(transacaoExistente.getDescricaoModel().getValor());
-            transacaoExistente.getDescricaoModel().geraValoresAutomatico();
-            return transacaoRepository.save(transacaoExistente);
-        } else {
-            throw new RuntimeException("Não foi possível realizar um update: Id não encontrado !");
-        }
+        findById(id);
+        TransacaoModel transacaoExistente = converterDtoEmEntity(transacaoRecordDTO);
+        transacaoExistente.setId(id);
+        transacaoExistente.getFormaPagamentoModel().validaParcela(transacaoExistente.getDescricaoModel().getValor());
+        transacaoExistente.getDescricaoModel().geraValoresAutomatico();
+        return transacaoRepository.save(transacaoExistente);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
