@@ -57,16 +57,18 @@ public class TransacaoService {
     public Object deleteById(UUID id) {
         findById(id);
         transacaoRepository.deleteById(id);
-        return ("O seguinte ID: ") + id + (" foi excluido com sucesso !");
+        return true;
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        findById(id);
-        TransacaoModel transacaoExistente = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoExistente.setId(id);
-        transacaoExistente.getFormaPagamentoModel().validaParcela(transacaoExistente.getDescricaoModel().getValor());
-        transacaoExistente.getDescricaoModel().geraValoresAutomatico();
-        return transacaoRepository.save(transacaoExistente);
+        Optional<TransacaoModel> transacaoExistente = findById(id);
+        TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
+        transacaoParaAtualizar.setId(id);
+        transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoRecordDTO.descricaoDePagamento().valor());
+        transacaoParaAtualizar.getDescricaoModel().setNsu(transacaoExistente.get().getDescricaoModel().getNsu());
+        transacaoParaAtualizar.getDescricaoModel().setCodigoAutorizacao(transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao());
+        transacaoParaAtualizar.getDescricaoModel().setStatus(transacaoExistente.get().getDescricaoModel().getStatus());
+        return transacaoRepository.save(transacaoParaAtualizar);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {

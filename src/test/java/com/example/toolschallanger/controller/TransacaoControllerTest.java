@@ -1,7 +1,7 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.config.validacoes.Validacoes;
+import com.example.toolschallanger.exceptions.validacoes.Validacoes;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.example.toolschallanger.mocks.MocksDTO.requestMockDTO;
 import static com.example.toolschallanger.mocks.MocksDTO.responseMockDTO;
 
 import static com.example.toolschallanger.mocks.MocksModel.*;

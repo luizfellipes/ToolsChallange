@@ -34,9 +34,10 @@ public class TransacaoServiceTest {
     //Caso de sucesso
     @Test
     public void deveTestarSave() {
-        when(transacaoService.save(any())).thenReturn(requestMockModel());
+        TransacaoModel transacaoModel = responseMockModel();
+        when(transacaoService.save(any())).thenReturn(transacaoModel);
 
-        Assertions.assertEquals(requestMockDTO(), responseMockDTO());
+        Assertions.assertEquals(transacaoModel, transacaoService.save(requestMockDTO()));
     }
 
     @Test
@@ -56,8 +57,9 @@ public class TransacaoServiceTest {
     @Test
     public void deveTestarFindById() {
         when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+        Optional<TransacaoModel> transacao = transacaoService.findById(requestMockModel().getId());
 
-        Assertions.assertTrue(transacaoService.findById(requestMockModel().getId()).isPresent());
+        Assertions.assertEquals(requestMockModel().getId() ,transacao.get().getId());
     }
 
     @Test
@@ -72,9 +74,7 @@ public class TransacaoServiceTest {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.updateById(any(), any())).thenReturn(transacaoModel);
 
-        TransacaoModel transacaoAtualizada = transacaoService.updateById(responseMockModel().getId(), responseMockDTO());
-
-        Assertions.assertEquals(transacaoModel, transacaoAtualizada);
+        Assertions.assertEquals(transacaoModel, transacaoService.updateById(responseMockModel().getId(), responseMockDTO()));
     }
 
 

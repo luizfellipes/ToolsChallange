@@ -65,6 +65,14 @@ public class DescricaoModel  {
         this.status = status;
     }
 
+    public void setNsu(Double nsu) {
+        this.nsu = nsu;
+    }
+
+    public void setCodigoAutorizacao(Double codigoAutorizacao) {
+        this.codigoAutorizacao = codigoAutorizacao;
+    }
+
     public void geraNsuValido() {
         if (this.valor <= 0) {
             this.nsu = 0D;
