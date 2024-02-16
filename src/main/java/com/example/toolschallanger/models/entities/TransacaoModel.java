@@ -61,4 +61,16 @@ public class TransacaoModel implements Serializable {
     }
 
 
+    public void geraValoresAutomatico() {
+        if (this.getDescricaoModel().getNsu() != null && this.getDescricaoModel().getCodigoAutorizacao() != null && this.getDescricaoModel().getStatus() != null) {
+            this.getDescricaoModel().setNsu(this.getDescricaoModel().getNsu());
+            this.getDescricaoModel().setCodigoAutorizacao(this.getDescricaoModel().getCodigoAutorizacao());
+            this.getDescricaoModel().setStatus(this.getDescricaoModel().getStatus());
+            this.id = getId();
+        } else {
+            getDescricaoModel().geraValoresValidos();
+        }
+    }
+
+
 }

@@ -50,7 +50,7 @@ public class TransacaoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id") UUID id) {
+    public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id")  UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.deleteById(id));
     }
 
