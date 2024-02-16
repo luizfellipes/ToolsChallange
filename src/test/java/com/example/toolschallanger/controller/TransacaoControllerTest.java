@@ -112,7 +112,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenReturn(Optional.of(requestMockModel()));
+        when(transacaoService.deleteById(any())).thenReturn(null);
 
         mockMvc.perform(delete("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)

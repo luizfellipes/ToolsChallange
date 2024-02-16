@@ -1,5 +1,6 @@
 package com.example.toolschallanger.service;
 
+import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
@@ -37,36 +38,45 @@ public class TransacaoServiceTest {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.save(any())).thenReturn(transacaoModel);
 
-        Assertions.assertEquals(transacaoModel, transacaoService.save(requestMockDTO()));
+        TransacaoModel save = transacaoService.save(requestMockDTO());
+
+        Assertions.assertEquals(transacaoModel, save);
     }
 
     @Test
     public void deveTestarEstorno() {
         when(transacaoService.estorno(any(), any())).thenReturn(requestMockModel());
 
-        Assertions.assertEquals(Status.CANCELADO, responseMockModel().getDescricaoModel().getStatus());
+        Status status = responseMockModel().getDescricaoModel().getStatus();
+
+        Assertions.assertEquals(Status.CANCELADO, status);
     }
 
     @Test
     public void deveTestarFindAll() {
         when(transacaoService.findAll()).thenReturn(List.of(requestMockModel()));
 
-        Assertions.assertFalse(transacaoService.findAll().isEmpty());
+        boolean listaVazia = transacaoService.findAll().isEmpty();
+
+        Assertions.assertFalse(listaVazia);
     }
 
     @Test
     public void deveTestarFindById() {
-        when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+        TransacaoModel transacaoModel = requestMockModel();
+        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
         Optional<TransacaoModel> transacao = transacaoService.findById(requestMockModel().getId());
 
-        Assertions.assertEquals(requestMockModel().getId() ,transacao.get().getId());
+        Assertions.assertEquals(transacaoModel.getId(), transacao.get().getId());
     }
 
     @Test
     public void deveTestarDelete() {
         when(transacaoService.deleteById(any())).thenReturn(null);
 
-        Assertions.assertNull(transacaoService.deleteById(requestMockModel().getId()));
+        Object transacaoDeletada = transacaoService.deleteById(requestMockModel().getId());
+
+        Assertions.assertNull(transacaoDeletada);
     }
 
     @Test
@@ -74,14 +84,16 @@ public class TransacaoServiceTest {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.updateById(any(), any())).thenReturn(transacaoModel);
 
-        Assertions.assertEquals(transacaoModel, transacaoService.updateById(responseMockModel().getId(), responseMockDTO()));
+        TransacaoModel transacaoAtualizada = transacaoService.updateById(responseMockModel().getId(), responseMockDTO());
+
+        Assertions.assertEquals(transacaoModel, transacaoAtualizada);
     }
 
 
     //Caso de falha
     @Test
     public void deveDarErroAoRealizarSave() {
-        when(transacaoService.save(requestMockNullDTO())).thenThrow(new RuntimeException());
+        when(transacaoService.save(any(TransacaoRecordDTO.class))).thenThrow(new RuntimeException());
 
         Assertions.assertThrows(RuntimeException.class, () -> transacaoService.save(requestMockNullDTO()));
     }
