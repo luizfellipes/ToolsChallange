@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @ControllerAdvice
 public class Validacoes {
@@ -24,15 +25,13 @@ public class Validacoes {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<String> runtimeException(RuntimeException exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro encontrado: " + exception.getLocalizedMessage());
+    public ResponseEntity<Object> runtimeException(RuntimeException exception) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("Um erro foi encontrado.", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ResponseEntity<String> solicitacaoNaoPermitida(HttpRequestMethodNotSupportedException exception) {
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Esse tipo de solicitação não é permitida: " + exception.getMessage());
-    }
+
 
 
 }
