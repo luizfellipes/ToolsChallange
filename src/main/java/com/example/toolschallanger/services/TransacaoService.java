@@ -7,11 +7,12 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 
 import java.util.*;
+
 
 @Service
 public class TransacaoService {
@@ -24,8 +25,6 @@ public class TransacaoService {
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoModel.getDescricaoModel().geraValoresAutomatico();
-        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
         return transacaoRepository.save(transacaoModel);
     }
 
@@ -42,39 +41,38 @@ public class TransacaoService {
     }
 
     public List<TransacaoModel> findAll() {
-        if (transacaoRepository.findAll().isEmpty()) {
-            throw new RuntimeException("Não foi possivel realizar uma busca na base: não existem transações registradas !");
-        } else {
-            return transacaoRepository.findAll();
-        }
+        return Optional.of(transacaoRepository.findAll())
+                .filter(listaDeTransacoes -> !listaDeTransacoes.isEmpty())
+                .orElseThrow(() -> new RuntimeException("Não foi possível buscar a transação na base, transação solicitada não existente!"));
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
-        return Optional.ofNullable(transacaoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID informado !")));
+        return Optional.ofNullable(transacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID informado !")));
     }
 
     public Object deleteById(UUID id) {
         findById(id);
         transacaoRepository.deleteById(id);
-        return true;
+        return ("O seguinte id: ") + id + (" foi deletado com sucesso !");
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        Optional<TransacaoModel> transacaoExistente = findById(id);
+        TransacaoModel transacaoExistente = findById(id).get();
         TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoParaAtualizar.setId(id);
-        transacaoParaAtualizar.getFormaPagamentoModel().validaParcela(transacaoRecordDTO.descricaoDePagamento().valor());
-        transacaoParaAtualizar.getDescricaoModel().setNsu(transacaoExistente.get().getDescricaoModel().getNsu());
-        transacaoParaAtualizar.getDescricaoModel().setCodigoAutorizacao(transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao());
-        transacaoParaAtualizar.getDescricaoModel().setStatus(transacaoExistente.get().getDescricaoModel().getStatus());
+        BeanUtils.copyProperties(transacaoExistente, transacaoParaAtualizar);
+        transacaoParaAtualizar.geraValoresAutomatico();
         return transacaoRepository.save(transacaoParaAtualizar);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        return new TransacaoModel(transacaoRecordDTO.cartao(),
+        TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(),
                 new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
+        transacaoModel.geraValoresAutomatico();
+        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
+        return transacaoModel;
     }
+
 
 }
