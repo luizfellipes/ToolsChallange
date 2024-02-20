@@ -31,32 +31,32 @@ public class TransacaoController {
     }
 
     @PostMapping("/estorno/{id}")
-    @Operation(summary = "Estorno", description = "Estorna transações", tags = "Transações")
+    @Operation(summary = "Estorno", description = "Estorna as transacoes autorizadas ou erradas transações", tags = "Transações")
     public ResponseEntity<Object> estorno(@PathVariable(value = "id") UUID id, @Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(id, transacaoRecordDto));
     }
 
     @GetMapping
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
-    public ResponseEntity<List<TransacaoModel>> getAlltransacao() {
+    public ResponseEntity<List<TransacaoModel>> getAll() {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> getOneTransacao(@PathVariable(value = "id") UUID id) {
+    public ResponseEntity<Object> getOne(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findById(id));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> deleteTransacao(@PathVariable(value = "id")  UUID id) {
+    public ResponseEntity<Object> delete(@PathVariable(value = "id")  UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.deleteById(id));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> updateTransacao(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
+    public ResponseEntity<Object> update(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 

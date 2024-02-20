@@ -7,7 +7,6 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 
@@ -25,6 +24,7 @@ public class TransacaoService {
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
+        transacaoModel.getDescricaoModel().geraValoresValidos();
         return transacaoRepository.save(transacaoModel);
     }
 
@@ -48,20 +48,22 @@ public class TransacaoService {
 
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.ofNullable(transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID informado !")));
+                .orElseThrow(() -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID: "+ id)));
     }
 
     public Object deleteById(UUID id) {
         findById(id);
         transacaoRepository.deleteById(id);
-        return ("O seguinte id: ") + id + (" foi deletado com sucesso !");
+        return id + (" deletado !");
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoExistente = findById(id).get();
+        Optional<TransacaoModel> transacaoExistente = findById(id);
         TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoExistente, transacaoParaAtualizar);
-        transacaoParaAtualizar.geraValoresAutomatico();
+        transacaoParaAtualizar.setId(id);
+        transacaoParaAtualizar.getDescricaoModel().setNsu(transacaoExistente.get().getDescricaoModel().getNsu());
+        transacaoParaAtualizar.getDescricaoModel().setCodigoAutorizacao(transacaoExistente.get().getDescricaoModel().getCodigoAutorizacao());
+        transacaoParaAtualizar.getDescricaoModel().setStatus(transacaoExistente.get().getDescricaoModel().getStatus());
         return transacaoRepository.save(transacaoParaAtualizar);
     }
 
@@ -69,7 +71,6 @@ public class TransacaoService {
         TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(),
                 new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
-        transacaoModel.geraValoresAutomatico();
         transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
         return transacaoModel;
     }

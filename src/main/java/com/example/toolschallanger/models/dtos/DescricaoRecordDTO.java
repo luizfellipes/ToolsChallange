@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
+
 public record DescricaoRecordDTO(
         @NotNull(message = "Um valor minimo deve ser inserido para a transação.")
         Double valor,
@@ -12,7 +13,4 @@ public record DescricaoRecordDTO(
         LocalDateTime dataHora,
         @NotBlank(message = "O nome do estabelecimento precisa ser preenchido.")
         String estabelecimento) {
-
-
-
 }
