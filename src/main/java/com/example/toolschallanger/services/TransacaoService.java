@@ -48,13 +48,13 @@ public class TransacaoService {
 
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.ofNullable(transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID: "+ id)));
+                .orElseThrow(() -> new RuntimeException("Não foi encontrado nenhuma transação correspondente ao ID: " + id)));
     }
 
     public Object deleteById(UUID id) {
         findById(id);
         transacaoRepository.deleteById(id);
-        return id + (" deletado !");
+        return new HashMap<>() {{ put("O seguinte ID", id + " foi deletado !");}};
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
