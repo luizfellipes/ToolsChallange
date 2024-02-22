@@ -32,7 +32,7 @@ public class FormaPagamentoModel {
     public void validaParcela(Double valor) {
         if (this.parcelas <= 1 || valor < 100) {
             if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {
-                throw new RuntimeException("Não foi possivel parcelar sua compra, em caso de parcelado é necessario ser maior que 1 !");
+                throw new RuntimeException("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
             }
         }
     }
