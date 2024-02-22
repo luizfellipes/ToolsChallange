@@ -65,7 +65,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveRealizarUmEstorno() throws Exception {
-        when(transacaoService.estorno(any(), any())).thenReturn(responseMockModel());
+        when(transacaoService.estorno(any())).thenReturn(responseMockModel());
 
         mockMvc.perform(post("/transacoes/estorno/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)

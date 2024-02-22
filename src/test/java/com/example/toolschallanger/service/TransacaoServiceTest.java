@@ -45,7 +45,7 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveTestarEstorno() {
-        when(transacaoService.estorno(any(), any())).thenReturn(requestMockModel());
+        when(transacaoService.estorno(any())).thenReturn(requestMockModel());
 
         Status status = responseMockModel().getDescricaoModel().getStatus();
 
@@ -100,9 +100,9 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveDarErroAoRealizarEstorno() {
-        when(transacaoService.estorno(any(), any())).thenThrow(new RuntimeException());
+        when(transacaoService.estorno(any())).thenThrow(new RuntimeException());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.estorno(UUID.randomUUID(), requestMockNullDTO()));
+        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.estorno(UUID.randomUUID()));
     }
 
     @Test
