@@ -24,15 +24,13 @@ public class TransacaoService {
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoModel.getDescricaoModel().geraValoresValidos();
+
         return transacaoRepository.save(transacaoModel);
     }
 
-    public TransacaoModel estorno(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        findById(id);
-        TransacaoModel transacaoParaEstornar = converterDtoEmEntity(transacaoRecordDTO);
+    public TransacaoModel estorno(UUID id) {
+        TransacaoModel transacaoParaEstornar = findById(id).get();
         if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
-            transacaoParaEstornar.setId(id);
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
@@ -54,7 +52,9 @@ public class TransacaoService {
     public Object deleteById(UUID id) {
         findById(id);
         transacaoRepository.deleteById(id);
-        return new HashMap<>() {{ put("O seguinte ID", id + " foi deletado !");}};
+        return new HashMap<>() {{
+            put("O seguinte ID", id + " foi deletado !");
+        }};
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
@@ -68,11 +68,9 @@ public class TransacaoService {
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(),
+        return new TransacaoModel(transacaoRecordDTO.cartao(),
                 new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
-        transacaoModel.getFormaPagamentoModel().validaParcela(transacaoModel.getDescricaoModel().getValor());
-        return transacaoModel;
     }
 
 
