@@ -100,7 +100,7 @@ public class DescricaoModel {
 
     public void verificaValorNegativo() {
         if (this.valor < 0.0) {
-            throw new RuntimeException("Valores negativos não são permitidos !");
+            throw new IllegalArgumentException("Valores negativos não são permitidos !");
         }
     }
 
