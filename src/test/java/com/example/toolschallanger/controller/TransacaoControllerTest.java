@@ -65,7 +65,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveRealizarUmEstorno() throws Exception {
-        when(transacaoService.estorno(any(), any())).thenReturn(responseMockModel());
+        when(transacaoService.estorno(any())).thenReturn(responseMockModel());
 
         mockMvc.perform(post("/transacoes/estorno/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +131,7 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestNullMockModel())))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
@@ -143,7 +143,7 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Optional.empty())))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andReturn();
     }
 

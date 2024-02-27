@@ -12,37 +12,31 @@ public class DescricaoModelTest {
 
     @Test
     public void deveTestarStatusAUTORIZADO() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissor());
         Assertions.assertEquals(Status.AUTORIZADO, responseMockModelParceladoEmissor().getDescricaoModel().verificaStatus());
     }
 
     @Test
     public void deveTestarStatusNEGADO() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissorValorZero());
-        Assertions.assertEquals(Status.NEGADO, responseMockModelParceladoEmissorValorZero().getDescricaoModel().verificaStatus());
+        Assertions.assertEquals(Status.NEGADO, responseMockModelStatusNegado().getDescricaoModel().getStatus());
     }
 
     @Test
     public void deveDarErroStatusAutorizado() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissor());
         Assertions.assertNotEquals(Status.NEGADO, responseMockModelParceladoEmissor().getDescricaoModel().verificaStatus());
     }
 
     @Test
     public void deveDarErroStatusNegado() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissorValorZero());
-        Assertions.assertNotEquals(Status.AUTORIZADO, responseMockModelParceladoEmissorValorZero().getDescricaoModel().verificaStatus());
+        Assertions.assertNotEquals(Status.AUTORIZADO, responseMockModelStatusNegado().getDescricaoModel().verificaStatus());
     }
 
     @Test
     public void deveTestarVerificaValorNegativo() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissorValorNegativo());
         Assertions.assertThrows(RuntimeException.class, () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo());
     }
 
     @Test
     public void deveDarErroAoVerificaValorNegativo() {
-        Assertions.assertNotNull(responseMockModelParceladoEmissor());
         Assertions.assertDoesNotThrow(() -> responseMockModelParceladoEmissor().getDescricaoModel().verificaValorNegativo());
     }
 

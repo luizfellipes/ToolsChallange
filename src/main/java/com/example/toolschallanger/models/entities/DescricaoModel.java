@@ -25,6 +25,7 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
+        geraValoresValidos();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -34,6 +35,7 @@ public class DescricaoModel {
         this.nsu = nsu;
         this.codigoAutorizacao = codigoAutorizacao;
         this.status = status;
+        geraValoresValidos();
     }
 
     public Double getValor() {
@@ -73,23 +75,23 @@ public class DescricaoModel {
     }
 
     public void geraNsuValido() {
-        if (this.valor <= 0) {
+        if (this.valor <= 0.0) {
             this.nsu = 0D;
         } else {
-            this.nsu = Math.random() * 10;
+            this.nsu = Math.floor(Math.random() * 1000);
         }
     }
 
     public void geraCodigoAutorizacaoValido() {
-        if (this.valor <= 0) {
+        if (this.valor <= 0.0) {
             this.codigoAutorizacao = 0D;
         } else {
-            this.codigoAutorizacao = Math.random() * 10;
+            this.codigoAutorizacao = Math.floor(Math.random() * 1000);
         }
     }
 
     public Status verificaStatus() {
-        if (this.valor <= 0) {
+        if (this.valor <= 0.0) {
             return this.status = Status.NEGADO;
         } else {
             return this.status = Status.AUTORIZADO;
@@ -97,16 +99,22 @@ public class DescricaoModel {
     }
 
     public void verificaValorNegativo() {
-        if (this.valor < 0) {
-            throw new RuntimeException("Valores negativos não são permitidos !");
+        if (this.valor < 0.0) {
+            throw new IllegalArgumentException("Valores negativos não são permitidos !");
         }
     }
 
     public void geraValoresValidos() {
-        verificaValorNegativo();
-        geraNsuValido();
-        geraCodigoAutorizacaoValido();
-        verificaStatus();
+        if (this.nsu == null && this.codigoAutorizacao == null && this.status == null) {
+            verificaValorNegativo();
+            geraNsuValido();
+            geraCodigoAutorizacaoValido();
+            verificaStatus();
+        } else {
+            this.nsu = getNsu();
+            this.codigoAutorizacao = getCodigoAutorizacao();
+            this.status = getStatus();
+        }
     }
 
 }
