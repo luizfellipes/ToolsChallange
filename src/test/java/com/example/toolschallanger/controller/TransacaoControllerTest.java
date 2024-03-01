@@ -6,6 +6,7 @@ import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +36,11 @@ public class TransacaoControllerTest {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private TransacaoService transacaoService;
-    private TransacaoController transacaoController;
 
     @BeforeEach
     public void setUp() {
         this.transacaoService = mock(TransacaoService.class);
-        this.transacaoController = new TransacaoController(transacaoService);
+        TransacaoController transacaoController = new TransacaoController(transacaoService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
                 .setControllerAdvice(new Validacoes()).build();
         this.objectMapper = new ObjectMapper()
@@ -149,7 +149,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        when(transacaoService.findAll().isEmpty()).thenThrow(new RuntimeException());
+        when(transacaoService.findAll().isEmpty()).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(get("/transacoes/"))
                 .andDo(print())
@@ -159,7 +159,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new RuntimeException());
+        when(transacaoService.findById(any())).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
@@ -169,7 +169,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenThrow(new RuntimeException());
+        when(transacaoService.deleteById(any())).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

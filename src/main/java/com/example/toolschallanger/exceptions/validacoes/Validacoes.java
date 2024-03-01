@@ -1,7 +1,6 @@
 package com.example.toolschallanger.exceptions.validacoes;
 
 
-import com.example.toolschallanger.response.responsePersonalizada;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Collections;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -20,7 +18,7 @@ import java.util.stream.Stream;
 public class Validacoes {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
-    public ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
+    private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
         Map<String, Object> camposVazios = new HashMap<>();
         if (exception instanceof MethodArgumentNotValidException validacaoEx) {
             validacaoEx.getBindingResult().getFieldErrors().forEach(erro -> camposVazios.put(erro.getField(), erro.getDefaultMessage()));
@@ -33,7 +31,7 @@ public class Validacoes {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> EntityNotFoundException(EntityNotFoundException exception) {
+    private ResponseEntity<Object> EntityNotFoundException(EntityNotFoundException exception) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("StatusCode", HttpStatus.NOT_FOUND.value());
         errorResponse.put("Detalhes", exception.getMessage());
@@ -41,7 +39,7 @@ public class Validacoes {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
+    private ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("StatusCode", HttpStatus.BAD_REQUEST.value());
         errorResponse.put("Detalhes", exception.getMessage());

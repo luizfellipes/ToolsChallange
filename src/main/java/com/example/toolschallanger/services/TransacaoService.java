@@ -8,7 +8,6 @@ import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -55,10 +54,9 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        Optional<TransacaoModel> transacaoExistente = findById(id);
-        TransacaoModel transacaoParaAtualizar = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoExistente.get(), transacaoParaAtualizar, "id");
-        return transacaoRepository.save(transacaoParaAtualizar);
+        Optional<TransacaoModel> transacaoExistente = findById(id).map(transacaoModel -> converterDtoEmEntity(transacaoRecordDTO));
+        transacaoExistente.get().setId(id);
+        return transacaoRepository.save(transacaoExistente.get());
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
