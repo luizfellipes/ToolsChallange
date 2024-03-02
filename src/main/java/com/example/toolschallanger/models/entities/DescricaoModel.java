@@ -74,6 +74,18 @@ public class DescricaoModel {
         this.codigoAutorizacao = codigoAutorizacao;
     }
 
+    public void setValor(Double valor) {
+        this.valor = valor;
+    }
+
+    public void setDataHora(LocalDateTime dataHora) {
+        this.dataHora = dataHora;
+    }
+
+    public void setEstabelecimento(String estabelecimento) {
+        this.estabelecimento = estabelecimento;
+    }
+
     public void geraNsuValido() {
         if (this.valor <= 0.0) {
             this.nsu = 0D;

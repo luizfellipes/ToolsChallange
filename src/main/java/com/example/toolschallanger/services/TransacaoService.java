@@ -7,7 +7,10 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
+import com.example.toolschallanger.response.responsePersonalizada;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,17 +32,17 @@ public class TransacaoService {
 
     public TransacaoModel estorno(UUID id) {
         TransacaoModel transacaoParaEstornar = findById(id).get();
-        if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
+        if (transacaoParaEstornar.getDescricaoModel().getStatus() == Status.AUTORIZADO) {
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
             throw new IllegalArgumentException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
+//return response(HttpStatus.BAD_REQUEST.value(), "teste", List.of());
         }
     }
 
     public List<TransacaoModel> findAll() {
         return Optional.of(transacaoRepository.findAll())
-                .filter(lista -> !lista.isEmpty())
                 .orElseThrow(() -> new EntityNotFoundException("Sem transações registradas !"));
     }
 
@@ -48,15 +51,15 @@ public class TransacaoService {
                 .orElseThrow(() -> new EntityNotFoundException("ID não existente !")));
     }
 
-    public Object deleteById(UUID id) {
-        findById(id).ifPresent(transacao -> transacaoRepository.deleteById(id));
-        return Collections.singletonMap("Foi deletado o seguinte ID", id);
+    public void deleteById(UUID id) {
+        findById(id).ifPresent(transacaoModel -> transacaoRepository.deleteById(id));
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        Optional<TransacaoModel> transacaoExistente = findById(id).map(transacaoModel -> converterDtoEmEntity(transacaoRecordDTO));
-        transacaoExistente.get().setId(id);
-        return transacaoRepository.save(transacaoExistente.get());
+        TransacaoModel transacaoExistente = findById(id).get();
+        TransacaoModel transacaoModelNova = converterDtoEmEntity(transacaoRecordDTO);
+        BeanUtils.copyProperties(transacaoModelNova, transacaoExistente,"id");
+        return transacaoRepository.save(transacaoExistente);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
@@ -65,5 +68,8 @@ public class TransacaoService {
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
     }
 
+  /*  public TransacaoModel response(int statusCode, String mensagem, List<TransacaoModel> transacoes) {
+        return new responsePersonalizada(statusCode, mensagem, transacoes);
+    }*/
 
 }

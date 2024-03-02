@@ -29,6 +29,14 @@ public class FormaPagamentoModel {
         return parcelas;
     }
 
+    public void setTipo(FormaPagamento tipo) {
+        this.tipo = tipo;
+    }
+
+    public void setParcelas(Integer parcelas) {
+        this.parcelas = parcelas;
+    }
+
     public void validaParcela(Double valor) {
         if (this.parcelas <= 1 || valor < 100) {
             if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {

@@ -33,7 +33,7 @@ public class TransacaoController {
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna as transacoes autorizadas ou erradas transações", tags = "Transações")
     public ResponseEntity<Object> estorno(@PathVariable(value = "id") UUID id) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transacaoService.estorno(id));
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.estorno(id));
     }
 
     @GetMapping
@@ -50,8 +50,9 @@ public class TransacaoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> delete(@PathVariable(value = "id")  UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.deleteById(id));
+    public ResponseEntity<?> delete(@PathVariable(value = "id")  UUID id) {
+        transacaoService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

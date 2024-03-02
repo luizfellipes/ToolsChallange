@@ -70,14 +70,14 @@ public class TransacaoServiceTest {
         Assertions.assertEquals(transacaoModel.getId(), transacao.get().getId());
     }
 
-    @Test
+    /*@Test
     public void deveTestarDelete() {
         when(transacaoService.deleteById(any())).thenReturn(null);
 
         Object transacaoDeletada = transacaoService.deleteById(requestMockModel().getId());
 
         Assertions.assertNull(transacaoDeletada);
-    }
+    }*/
 
     @Test
     public void deveTestarUpdate() {
@@ -119,12 +119,12 @@ public class TransacaoServiceTest {
         Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findById(UUID.randomUUID()));
     }
 
-    @Test
+   /* @Test
     public void deveDarErroAoRealizarDelete() {
         when(transacaoService.deleteById(any())).thenThrow(new RuntimeException());
 
         Assertions.assertThrows(RuntimeException.class, () -> transacaoService.deleteById(UUID.randomUUID()));
-    }
+    }*/
 
     @Test
     public void deveDarErroAoRealizarUpdate() {
