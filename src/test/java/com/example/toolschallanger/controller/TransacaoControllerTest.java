@@ -2,6 +2,7 @@ package com.example.toolschallanger.controller;
 
 
 import com.example.toolschallanger.exceptions.validacoes.Validacoes;
+import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -71,7 +72,7 @@ public class TransacaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responseMockModel())))
                 .andDo(print())
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricaoModel.status").value("CANCELADO"))
                 .andReturn();
     }
@@ -112,13 +113,13 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenReturn(null);
+        when(transacaoService.findById(any())).thenReturn(null);
 
         mockMvc.perform(delete("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responseMockDTO())))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn();
     }
 
@@ -169,7 +170,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenThrow(new EntityNotFoundException());
+        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

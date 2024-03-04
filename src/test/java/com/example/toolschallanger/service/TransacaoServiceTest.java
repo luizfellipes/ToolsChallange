@@ -4,6 +4,7 @@ import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,14 +71,14 @@ public class TransacaoServiceTest {
         Assertions.assertEquals(transacaoModel.getId(), transacao.get().getId());
     }
 
-    /*@Test
+    @Test
     public void deveTestarDelete() {
-        when(transacaoService.deleteById(any())).thenReturn(null);
+        TransacaoModel transacaoModel = requestMockModel();
+        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
 
-        Object transacaoDeletada = transacaoService.deleteById(requestMockModel().getId());
-
-        Assertions.assertNull(transacaoDeletada);
-    }*/
+        transacaoService.deleteById(transacaoModel.getId());
+        verify(transacaoService, times(1)).deleteById(transacaoModel.getId());
+    }
 
     @Test
     public void deveTestarUpdate() {
@@ -119,12 +120,13 @@ public class TransacaoServiceTest {
         Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findById(UUID.randomUUID()));
     }
 
-   /* @Test
+    @Test
     public void deveDarErroAoRealizarDelete() {
-        when(transacaoService.deleteById(any())).thenThrow(new RuntimeException());
+        TransacaoModel transacaoModel = new TransacaoModel();
+        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(transacaoModel.getId());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.deleteById(UUID.randomUUID()));
-    }*/
+        Assertions.assertThrows(EntityNotFoundException.class, ()-> transacaoService.deleteById(transacaoModel.getId()));
+    }
 
     @Test
     public void deveDarErroAoRealizarUpdate() {
