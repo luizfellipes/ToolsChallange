@@ -7,10 +7,9 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-import com.example.toolschallanger.response.responsePersonalizada;
+
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,8 +35,7 @@ public class TransacaoService {
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
-            throw new IllegalArgumentException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
-//return response(HttpStatus.BAD_REQUEST.value(), "teste", List.of());
+            throw new IllegalArgumentException("Não foi possivel realizar um estorno, a transação esta cancelada !");
         }
     }
 
@@ -56,10 +54,10 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoExistente = findById(id).get();
+        Optional<TransacaoModel> transacaoExistente = findById(id);
         TransacaoModel transacaoModelNova = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoModelNova, transacaoExistente,"id");
-        return transacaoRepository.save(transacaoExistente);
+        BeanUtils.copyProperties(transacaoExistente.get(), transacaoModelNova, "transacaoModel.id", "transacaoModel.descricaoModel.nsu", "transacaoModel.descricaoModel.codigoAutorizacao", "transacaoModel.descricaoModel.status");
+        return transacaoRepository.save(transacaoModelNova);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
@@ -67,9 +65,5 @@ public class TransacaoService {
                 new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
     }
-
-  /*  public TransacaoModel response(int statusCode, String mensagem, List<TransacaoModel> transacoes) {
-        return new responsePersonalizada(statusCode, mensagem, transacoes);
-    }*/
 
 }

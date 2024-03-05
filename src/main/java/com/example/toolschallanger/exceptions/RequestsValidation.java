@@ -1,7 +1,6 @@
 package com.example.toolschallanger.exceptions.validacoes;
 
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +14,7 @@ import java.util.stream.Stream;
 
 
 @RestControllerAdvice
-public class Validacoes {
+public class RequestsValidation {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
     private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
@@ -25,25 +24,9 @@ public class Validacoes {
         } else if (exception instanceof NullPointerException) {
             Stream.of("descricaoDePagamento", "formaDePagamento")
                     .filter(campo -> exception.getMessage().contains(campo))
-                    .forEach(campo -> camposVazios.putIfAbsent(campo, "Este campo é obrigatório"));
+                    .forEach(campo -> camposVazios.putIfAbsent(campo, "This field is required !"));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(camposVazios);
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    private ResponseEntity<Object> EntityNotFoundException(EntityNotFoundException exception) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("StatusCode", HttpStatus.NOT_FOUND.value());
-        errorResponse.put("Detalhes", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    private ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("StatusCode", HttpStatus.BAD_REQUEST.value());
-        errorResponse.put("Detalhes", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 }

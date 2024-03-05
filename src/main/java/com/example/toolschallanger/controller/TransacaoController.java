@@ -4,12 +4,14 @@ import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.services.TransacaoService;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -32,7 +34,7 @@ public class TransacaoController {
 
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna as transacoes autorizadas ou erradas transações", tags = "Transações")
-    public ResponseEntity<Object> estorno(@PathVariable(value = "id") UUID id) {
+    public ResponseEntity<TransacaoModel> estorno(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.estorno(id));
     }
 
@@ -44,7 +46,7 @@ public class TransacaoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> getOne(@PathVariable(value = "id") UUID id) {
+    public ResponseEntity<Optional<TransacaoModel>> getOne(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findById(id));
     }
 
@@ -57,7 +59,7 @@ public class TransacaoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
-    public ResponseEntity<Object> update(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
+    public ResponseEntity<TransacaoModel> update(@PathVariable(value = "id") UUID id, @RequestBody @Valid TransacaoRecordDTO transacaoRecordDto) {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 

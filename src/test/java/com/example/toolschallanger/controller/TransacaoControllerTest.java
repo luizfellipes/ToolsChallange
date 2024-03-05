@@ -1,8 +1,9 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.exceptions.validacoes.Validacoes;
-import com.example.toolschallanger.models.entities.TransacaoModel;
+import com.example.toolschallanger.exceptions.validacoes.RequestExceptionBadRequest;
+import com.example.toolschallanger.exceptions.validacoes.RequestExceptionNotFound;
+import com.example.toolschallanger.exceptions.validacoes.RequestsValidation;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -43,7 +44,9 @@ public class TransacaoControllerTest {
         this.transacaoService = mock(TransacaoService.class);
         TransacaoController transacaoController = new TransacaoController(transacaoService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
-                .setControllerAdvice(new Validacoes()).build();
+                .setControllerAdvice(new RequestsValidation(),
+                        new RequestExceptionBadRequest(),
+                        new RequestExceptionNotFound()).build();
         this.objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModule(new JavaTimeModule());
