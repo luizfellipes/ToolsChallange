@@ -1,9 +1,6 @@
 package com.example.toolschallanger.response;
 
-import com.example.toolschallanger.models.entities.TransacaoModel;
-
 import java.io.Serializable;
-import java.util.List;
 
 public class ResponsePersonalizada implements Serializable {
 

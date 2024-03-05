@@ -1,4 +1,4 @@
-package com.example.toolschallanger.exceptions.validacoes;
+package com.example.toolschallanger.exceptions;
 
 
 import org.springframework.http.HttpStatus;

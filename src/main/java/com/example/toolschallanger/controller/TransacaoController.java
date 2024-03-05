@@ -4,7 +4,6 @@ import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.services.TransacaoService;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

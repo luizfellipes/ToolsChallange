@@ -3,7 +3,7 @@ package com.example.toolschallanger.controller;
 
 import com.example.toolschallanger.exceptions.validacoes.RequestExceptionBadRequest;
 import com.example.toolschallanger.exceptions.validacoes.RequestExceptionNotFound;
-import com.example.toolschallanger.exceptions.validacoes.RequestsValidation;
+import com.example.toolschallanger.exceptions.RequestsValidation;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -71,9 +71,9 @@ public class TransacaoControllerTest {
     public void deveRealizarUmEstorno() throws Exception {
         when(transacaoService.estorno(any())).thenReturn(responseMockModel());
 
-        mockMvc.perform(post("/transacoes/estorno/" + UUID.randomUUID())
+        mockMvc.perform(post("/transacoes/estorno/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(responseMockModel())))
+                        .content(objectMapper.writeValueAsString(requestMockModel())))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricaoModel.status").value("CANCELADO"))

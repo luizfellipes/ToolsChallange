@@ -1,5 +1,6 @@
 package com.example.toolschallanger.services;
 
+
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
@@ -35,13 +36,13 @@ public class TransacaoService {
             transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
             return transacaoRepository.save(transacaoParaEstornar);
         } else {
-            throw new IllegalArgumentException("Não foi possivel realizar um estorno, a transação esta cancelada !");
+            throw new IllegalArgumentException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
         }
     }
 
     public List<TransacaoModel> findAll() {
         return Optional.of(transacaoRepository.findAll())
-                .orElseThrow(() -> new EntityNotFoundException("Sem transações registradas !"));
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
@@ -54,10 +55,10 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        Optional<TransacaoModel> transacaoExistente = findById(id);
+        TransacaoModel transacaoExistente = findById(id).get();
         TransacaoModel transacaoModelNova = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoExistente.get(), transacaoModelNova, "transacaoModel.id", "transacaoModel.descricaoModel.nsu", "transacaoModel.descricaoModel.codigoAutorizacao", "transacaoModel.descricaoModel.status");
-        return transacaoRepository.save(transacaoModelNova);
+        BeanUtils.copyProperties(transacaoModelNova, transacaoExistente, "id");
+        return transacaoRepository.save(transacaoExistente);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
