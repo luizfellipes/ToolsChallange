@@ -1,6 +1,8 @@
 package com.example.toolschallanger.exceptions;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +18,8 @@ import java.util.stream.Stream;
 @RestControllerAdvice
 public class RequestsValidation extends Exception {
 
+    private static final Logger log = LogManager.getLogger(RequestsValidation.class);
+
     @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
     private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
         Map<String, Object> camposVazios = new HashMap<>();
@@ -26,6 +30,7 @@ public class RequestsValidation extends Exception {
                     .filter(campo -> exception.getMessage().contains(campo))
                     .forEach(campo -> camposVazios.putIfAbsent(campo, "This field is required !"));
         }
+        log.error("The fields are empty. " + camposVazios);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(camposVazios);
     }
 
