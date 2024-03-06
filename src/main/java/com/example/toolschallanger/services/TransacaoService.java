@@ -11,7 +11,8 @@ import com.example.toolschallanger.repositories.TransacaoRepository;
 import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,8 @@ import java.util.*;
 public class TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
-    private static final Logger log = LogManager.getLogger(TransacaoService.class);
+
+    private static final Logger log = LoggerFactory.getLogger(TransacaoService.class);
 
     public TransacaoService(TransacaoRepository transacaoRepository) {
         this.transacaoRepository = transacaoRepository;
@@ -77,11 +79,9 @@ public class TransacaoService {
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoModel = new TransacaoModel(transacaoRecordDTO.cartao(),
+        return new TransacaoModel(transacaoRecordDTO.cartao(),
                 new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
                 new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
-        log.info("Transaction transformed from DTO to Entity. " + transacaoModel);
-        return transacaoModel;
     }
 
 }

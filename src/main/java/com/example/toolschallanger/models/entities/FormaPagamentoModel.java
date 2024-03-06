@@ -45,7 +45,6 @@ public class FormaPagamentoModel {
     public void validaParcela(Double valor) {
         if (this.parcelas <= 1 || valor < 100) {
             if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {
-                log.error("It was not possible to pay in installments for your purchase.");
                 throw new RequestExceptionBadRequest("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
             }
         }

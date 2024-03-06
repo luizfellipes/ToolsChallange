@@ -21,7 +21,6 @@ public class DescricaoModel {
     private Double codigoAutorizacao;
     @Enumerated(EnumType.STRING)
     private Status status;
-    private static final Logger log = LogManager.getLogger(DescricaoModel.class);
 
     public DescricaoModel() {
     }
@@ -94,36 +93,29 @@ public class DescricaoModel {
     public void geraNsuValido() {
         if (this.valor <= 0.0) {
             this.nsu = 0D;
-            log.info("Error generating NSU.");
         } else {
             this.nsu = Math.floor(Math.random() * 1000);
-            log.info("NSU generating successfully.");
         }
     }
 
     public void geraCodigoAutorizacaoValido() {
         if (this.valor <= 0.0) {
             this.codigoAutorizacao = 0D;
-            log.info("Error generating authorization code.");
         } else {
             this.codigoAutorizacao = Math.floor(Math.random() * 1000);
-            log.info("Authorization code generating successfully.");
         }
     }
 
     public Status verificaStatus() {
         if (this.valor <= 0.0) {
-            log.info("Error generating the status.");
             return this.status = Status.NEGADO;
         } else {
-            log.info("Status generating successfully.");
             return this.status = Status.AUTORIZADO;
         }
     }
 
     public void verificaValorNegativo() {
         if (this.valor < 0.0) {
-            log.error("Negative values are not allowed.");
             throw new RequestExceptionBadRequest("Valores negativos não são permitidos !");
         }
     }
@@ -134,12 +126,10 @@ public class DescricaoModel {
             geraNsuValido();
             geraCodigoAutorizacaoValido();
             verificaStatus();
-            log.info("Generating new valid values.");
         } else {
             this.nsu = getNsu();
             this.codigoAutorizacao = getCodigoAutorizacao();
             this.status = getStatus();
-            log.info("Maintained existing values.");
         }
     }
 
