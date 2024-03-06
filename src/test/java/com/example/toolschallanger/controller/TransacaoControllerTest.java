@@ -1,8 +1,8 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.exceptions.validacoes.RequestExceptionBadRequest;
-import com.example.toolschallanger.exceptions.validacoes.RequestExceptionNotFound;
+import com.example.toolschallanger.exceptions.RequestExceptionNotFound;
+import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
 import com.example.toolschallanger.exceptions.RequestsValidation;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
