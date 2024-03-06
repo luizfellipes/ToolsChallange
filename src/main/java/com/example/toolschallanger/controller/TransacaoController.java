@@ -7,11 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,9 +45,9 @@ public class TransacaoController {
 
     @GetMapping
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
-    public ResponseEntity<List<TransacaoModel>> getAll() {
+    public ResponseEntity<Page<TransacaoModel>> getAll(Pageable pageable) {
         log.info("Seaching all transactions.");
-        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

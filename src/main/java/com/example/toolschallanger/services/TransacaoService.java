@@ -10,10 +10,11 @@ import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
 
-import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -50,8 +51,8 @@ public class TransacaoService {
         }
     }
 
-    public List<TransacaoModel> findAll() {
-        List<TransacaoModel> findAll = Optional.of(transacaoRepository.findAll())
+    public Page<TransacaoModel> findAll(Pageable pageable) {
+        Page<TransacaoModel> findAll = Optional.of(transacaoRepository.findAll(pageable))
                 .orElseThrow(() -> new RequestExceptionNotFound("Não há dados na base."));
         log.info("A search was carried out on the base.");
         return findAll;

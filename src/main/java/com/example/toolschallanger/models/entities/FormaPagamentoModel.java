@@ -2,11 +2,9 @@ package com.example.toolschallanger.models.entities;
 
 
 import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
-import com.example.toolschallanger.exceptions.RequestExceptionNotFound;
 import com.example.toolschallanger.models.enuns.FormaPagamento;
 import jakarta.persistence.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 
 //@Entity
@@ -16,7 +14,6 @@ public class FormaPagamentoModel {
     @Enumerated(EnumType.STRING)
     private FormaPagamento tipo;
     private Integer parcelas;
-    private static final Logger log = LogManager.getLogger(FormaPagamentoModel.class);
 
     public FormaPagamentoModel() {
     }
