@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,11 +55,11 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveTestarFindAll() {
-        when(transacaoService.findAll()).thenReturn(List.of(requestMockModel()));
+        when(transacaoService.findAll(any())).thenReturn(Page.empty());
 
-        boolean listaVazia = transacaoService.findAll().isEmpty();
+        boolean listaVazia = transacaoService.findAll(any()).isEmpty();
 
-        Assertions.assertFalse(listaVazia);
+        Assertions.assertTrue(listaVazia);
     }
 
     @Test
@@ -108,9 +108,9 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveDarErroAoRealizarFindAll() {
-        when(transacaoService.findAll()).thenThrow(new RuntimeException());
+        when(transacaoService.findAll(any())).thenThrow(new RuntimeException());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findAll());
+        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findAll(any()));
     }
 
     @Test

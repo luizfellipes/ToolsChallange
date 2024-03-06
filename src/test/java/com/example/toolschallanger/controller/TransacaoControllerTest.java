@@ -8,17 +8,17 @@ import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +44,7 @@ public class TransacaoControllerTest {
         this.transacaoService = mock(TransacaoService.class);
         TransacaoController transacaoController = new TransacaoController(transacaoService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setControllerAdvice(new RequestsValidation(),
                         new RequestExceptionBadRequest(),
                         new RequestExceptionNotFound()).build();
@@ -94,9 +95,9 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetAll() throws Exception {
-        when(transacaoService.findAll()).thenReturn(List.of(requestMockModel()));
+        when(transacaoService.findAll(any())).thenReturn(Page.empty());
 
-        mockMvc.perform(get("/transacoes/"))
+        mockMvc.perform(get("/transacoes?size=5?page=0"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -141,7 +142,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.updateById(any(), any())).thenThrow(new RuntimeException());
+        when(transacaoService.updateById(any(), any())).thenThrow(new RequestExceptionBadRequest());
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -153,9 +154,9 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        when(transacaoService.findAll().isEmpty()).thenThrow(new EntityNotFoundException());
+        doThrow(RequestExceptionNotFound.class).when(transacaoService).findAll(any());
 
-        mockMvc.perform(get("/transacoes/"))
+        mockMvc.perform(get("/transacoes"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -163,7 +164,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new EntityNotFoundException());
+        when(transacaoService.findById(any())).thenThrow(new RequestExceptionNotFound());
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
@@ -173,7 +174,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(any());
+        doThrow(RequestExceptionNotFound.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

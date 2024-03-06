@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class TransacaoController {
 
     @GetMapping
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
-    public ResponseEntity<Page<TransacaoModel>> getAll(Pageable pageable) {
+    public ResponseEntity<Page<TransacaoModel>> getAll(@PageableDefault(size=10) Pageable pageable) {
         log.info("Seaching all transactions.");
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll(pageable));
     }
