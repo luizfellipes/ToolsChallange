@@ -1,4 +1,4 @@
-package com.example.toolschallanger.exceptions.validacoes;
+package com.example.toolschallanger.exceptions;
 
 import com.example.toolschallanger.response.ResponsePersonalizada;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,7 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 
 @RestControllerAdvice
-public class RequestExceptionNotFound extends Exception {
+public class RequestExceptionNotFound extends EntityNotFoundException {
+
+
+    public RequestExceptionNotFound() {
+    }
+
+    public RequestExceptionNotFound(String message) {
+        super(message);
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> EntityNotFoundException(EntityNotFoundException exception) {

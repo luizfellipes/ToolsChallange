@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 
 @RestControllerAdvice
-public class RequestsValidation {
+public class RequestsValidation extends Exception {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
     private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
