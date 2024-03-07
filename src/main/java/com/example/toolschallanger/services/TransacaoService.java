@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 
 @Service
@@ -32,10 +33,12 @@ public class TransacaoService {
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoRepository.save(transacaoModel);
-        log.info("Saved transaction.");
-        return transacaoModel;
+        return Stream.of(transacaoRecordDTO)
+                .map(this::converterDtoEmEntity)
+                .map(transacaoRepository::save)
+                .peek(l -> log.info("Saved transaction."))
+                .findFirst()
+                .orElseThrow(RequestExceptionBadRequest::new);
     }
 
     public TransacaoModel estorno(UUID id) {
