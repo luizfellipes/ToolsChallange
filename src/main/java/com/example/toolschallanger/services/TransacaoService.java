@@ -49,7 +49,6 @@ public class TransacaoService {
             log.info("Transaction reversed on the following ID:" + id);
             return transacaoParaEstornar;
         } else {
-            log.error("Unable to make a transaction on the following ID:" + id);
             throw new RequestExceptionBadRequest("Estorno não permitido: Transação não autorizada!");
         }
     }
@@ -62,10 +61,11 @@ public class TransacaoService {
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
-        Optional<TransacaoModel> findByid = Optional.ofNullable(transacaoRepository.findById(id)
+        return Optional.ofNullable(transacaoRepository.findById(id)
+                .stream()
+                .peek(l -> log.info("The following id was searched: " + id))
+                .findFirst()
                 .orElseThrow(() -> new RequestExceptionNotFound("ID não existente !")));
-        log.info("The following id was searched: " + id);
-        return findByid;
     }
 
     public void deleteById(UUID id) {
