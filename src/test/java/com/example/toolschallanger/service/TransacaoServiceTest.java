@@ -1,5 +1,7 @@
 package com.example.toolschallanger.service;
 
+import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
+import com.example.toolschallanger.exceptions.RequestExceptionNotFound;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
@@ -94,45 +96,45 @@ public class TransacaoServiceTest {
     //Caso de falha
     @Test
     public void deveDarErroAoRealizarSave() {
-        when(transacaoService.save(any(TransacaoRecordDTO.class))).thenThrow(new RuntimeException());
+        when(transacaoService.save(any(TransacaoRecordDTO.class))).thenThrow(new RequestExceptionBadRequest());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.save(requestMockNullDTO()));
+        Assertions.assertThrows(RequestExceptionBadRequest.class, () -> transacaoService.save(requestMockNullDTO()));
     }
 
     @Test
     public void deveDarErroAoRealizarEstorno() {
-        when(transacaoService.estorno(any())).thenThrow(new RuntimeException());
+        when(transacaoService.estorno(any())).thenThrow(new RequestExceptionBadRequest());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.estorno(UUID.randomUUID()));
+        Assertions.assertThrows(RequestExceptionBadRequest.class, () -> transacaoService.estorno(UUID.randomUUID()));
     }
 
     @Test
     public void deveDarErroAoRealizarFindAll() {
-        when(transacaoService.findAll(any())).thenThrow(new RuntimeException());
+        when(transacaoService.findAll(any())).thenThrow(new RequestExceptionNotFound());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findAll(any()));
+        Assertions.assertThrows(RequestExceptionNotFound.class, () -> transacaoService.findAll(any()));
     }
 
     @Test
     public void deveDarErroAoRealizarFindById() {
-        when(transacaoService.findById(any())).thenThrow(new RuntimeException());
+        when(transacaoService.findById(any())).thenThrow(new RequestExceptionNotFound());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.findById(UUID.randomUUID()));
+        Assertions.assertThrows(RequestExceptionNotFound.class, () -> transacaoService.findById(UUID.randomUUID()));
     }
 
     @Test
     public void deveDarErroAoRealizarDelete() {
         TransacaoModel transacaoModel = new TransacaoModel();
-        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(transacaoModel.getId());
+        doThrow(RequestExceptionNotFound.class).when(transacaoService).deleteById(transacaoModel.getId());
 
-        Assertions.assertThrows(EntityNotFoundException.class, ()-> transacaoService.deleteById(transacaoModel.getId()));
+        Assertions.assertThrows(RequestExceptionNotFound.class, ()-> transacaoService.deleteById(transacaoModel.getId()));
     }
 
     @Test
     public void deveDarErroAoRealizarUpdate() {
-        when(transacaoService.updateById(any(), any())).thenThrow(new RuntimeException());
+        when(transacaoService.updateById(any(), any())).thenThrow(new RequestExceptionNotFound());
 
-        Assertions.assertThrows(RuntimeException.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
+        Assertions.assertThrows(RequestExceptionNotFound.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
     }
 
 }

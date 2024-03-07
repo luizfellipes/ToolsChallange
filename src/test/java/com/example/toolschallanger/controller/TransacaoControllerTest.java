@@ -130,7 +130,7 @@ public class TransacaoControllerTest {
     //deve testar caso de falha
     @Test
     public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
-        when(transacaoService.save(any())).thenReturn(requestNullMockModel());
+        when(transacaoService.save(any())).thenThrow(new RequestExceptionBadRequest());
 
         mockMvc.perform(post("/transacoes")
                         .contentType(MediaType.APPLICATION_JSON)
