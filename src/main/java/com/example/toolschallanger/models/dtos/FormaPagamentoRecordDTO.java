@@ -3,7 +3,6 @@ package com.example.toolschallanger.models.dtos;
 import com.example.toolschallanger.models.enuns.FormaPagamento;
 import jakarta.validation.constraints.NotNull;
 
-
 public record FormaPagamentoRecordDTO(
         @NotNull(message = "O tipo de pagamento não pode ser nulo. Escolha entre: AVISTA, PARCELADO_LOJA ou PARCELADO_EMISSOR.")
         FormaPagamento tipo,
