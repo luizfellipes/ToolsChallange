@@ -27,8 +27,8 @@ public class RequestsValidation {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), camposVazios));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
+    @ExceptionHandler(transacaoBadRequest.class)
+    public ResponseEntity<Object> transacaoBadRequest(transacaoBadRequest exception) {
         log.error("Error in the request.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
     }

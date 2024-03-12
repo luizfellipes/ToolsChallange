@@ -2,6 +2,7 @@ package com.example.toolschallanger.services;
 
 
 import com.example.toolschallanger.exceptions.transacaoNaoEncontrada;
+import com.example.toolschallanger.exceptions.transacaoBadRequest;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
@@ -38,7 +39,7 @@ public class TransacaoService {
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(transacaoBadRequest::new);
     }
 
     public TransacaoModel estorno(UUID id) {
@@ -48,7 +49,7 @@ public class TransacaoService {
                 .peek(transacaoModel -> transacaoModel.get().getDescricaoModel().setStatus(Status.CANCELADO))
                 .map(transacaoModel -> transacaoRepository.save(findById(id).get()))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(transacaoBadRequest::new);
     }
 
     public Page<TransacaoModel> findAll(Pageable pageable) {

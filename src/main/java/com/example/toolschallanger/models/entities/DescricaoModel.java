@@ -1,11 +1,8 @@
 package com.example.toolschallanger.models.entities;
 
-import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
+import com.example.toolschallanger.exceptions.transacaoBadRequest;
 import com.example.toolschallanger.models.enuns.Status;
-import com.example.toolschallanger.services.TransacaoService;
 import jakarta.persistence.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +26,6 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
-        geraValoresValidos();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -116,7 +112,7 @@ public class DescricaoModel {
 
     public void verificaValorNegativo() {
         if (this.valor < 0.0) {
-            throw new RequestExceptionBadRequest("Valores negativos não são permitidos !");
+            throw new transacaoBadRequest("Valores negativos não são permitidos !");
         }
     }
 
