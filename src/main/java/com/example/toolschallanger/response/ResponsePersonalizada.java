@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class ResponsePersonalizada implements Serializable {
 
     private int statusCode;
-    private String message;
+    private Object message;
 
-    public ResponsePersonalizada(int statusCode, String message) {
+    public ResponsePersonalizada(int statusCode, Object message) {
         this.statusCode = statusCode;
         this.message = message;
     }
@@ -16,7 +16,7 @@ public class ResponsePersonalizada implements Serializable {
         return statusCode;
     }
 
-    public String getMessage() {
+    public Object getMessage() {
         return message;
     }
 
