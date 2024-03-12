@@ -1,6 +1,7 @@
 package com.example.toolschallanger.exceptions;
 
 
+import com.example.toolschallanger.response.ResponsePersonalizada;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -9,29 +10,34 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 
 @RestControllerAdvice
-public class RequestsValidation extends Exception {
+public class RequestsValidation {
 
     private static final Logger log = LogManager.getLogger(RequestsValidation.class);
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
-    private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    private ResponseEntity<Object> validaCamposNulosOuVazio(MethodArgumentNotValidException exception) {
         Map<String, Object> camposVazios = new HashMap<>();
-        if (exception instanceof MethodArgumentNotValidException validacaoEx) {
-            validacaoEx.getBindingResult().getFieldErrors().forEach(erro -> camposVazios.put(erro.getField(), erro.getDefaultMessage()));
-        } else if (exception instanceof NullPointerException) {
-            Stream.of("descricaoDePagamento", "formaDePagamento")
-                    .filter(campo -> exception.getMessage().contains(campo))
-                    .forEach(campo -> camposVazios.putIfAbsent(campo, "This field is required !"));
-        }
+        exception.getBindingResult().getFieldErrors().forEach(erro -> camposVazios.put(erro.getField(), erro.getDefaultMessage()));
         log.error("The fields are empty. " + camposVazios);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(camposVazios);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), camposVazios));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
+        log.error("Error in the request.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(transacaoNaoEncontrada.class)
+    public ResponseEntity<Object> transacaoNaoEncontrada(transacaoNaoEncontrada exception) {
+        log.error("Not Found a transaction.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponsePersonalizada(HttpStatus.NOT_FOUND.value(), exception.getMessage()));
+    }
+
 
 }
