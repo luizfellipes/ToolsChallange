@@ -1,13 +1,12 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.exceptions.RequestExceptionNotFound;
-import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
 import com.example.toolschallanger.exceptions.RequestsValidation;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,9 +44,7 @@ public class TransacaoControllerTest {
         TransacaoController transacaoController = new TransacaoController(transacaoService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .setControllerAdvice(new RequestsValidation(),
-                        new RequestExceptionBadRequest(),
-                        new RequestExceptionNotFound()).build();
+                .setControllerAdvice(new RequestsValidation()).build();
         this.objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModule(new JavaTimeModule());
@@ -130,7 +127,7 @@ public class TransacaoControllerTest {
     //deve testar caso de falha
     @Test
     public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
-        when(transacaoService.save(any())).thenThrow(new RequestExceptionBadRequest());
+        when(transacaoService.save(any())).thenThrow(new IllegalArgumentException());
 
         mockMvc.perform(post("/transacoes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +139,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.updateById(any(), any())).thenThrow(new RequestExceptionBadRequest());
+        when(transacaoService.updateById(any(), any())).thenThrow(new IllegalArgumentException());
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +151,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        doThrow(RequestExceptionNotFound.class).when(transacaoService).findAll(any());
+        doThrow(EntityNotFoundException.class).when(transacaoService).findAll(any());
 
         mockMvc.perform(get("/transacoes"))
                 .andDo(print())
@@ -164,7 +161,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new RequestExceptionNotFound());
+        when(transacaoService.findById(any())).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
@@ -174,7 +171,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        doThrow(RequestExceptionNotFound.class).when(transacaoService).deleteById(any());
+        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
