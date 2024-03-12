@@ -1,14 +1,13 @@
 package com.example.toolschallanger.services;
 
 
-import com.example.toolschallanger.exceptions.RequestExceptionNotFound;
+import com.example.toolschallanger.exceptions.transacaoNaoEncontrada;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
-import com.example.toolschallanger.exceptions.RequestExceptionBadRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,29 +34,29 @@ public class TransacaoService {
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         return Stream.of(transacaoRecordDTO)
                 .map(this::converterDtoEmEntity)
+                .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
                 .findFirst()
-                .orElseThrow(RequestExceptionBadRequest::new);
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public TransacaoModel estorno(UUID id) {
-        TransacaoModel transacaoParaEstornar = findById(id).get();
-        if (transacaoParaEstornar.getDescricaoModel().getStatus() == Status.AUTORIZADO) {
-            transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
-            transacaoRepository.save(transacaoParaEstornar);
-            log.info("Transaction reversed on the following ID:" + id);
-            return transacaoParaEstornar;
-        } else {
-            throw new RequestExceptionBadRequest("Estorno não permitido: Transação não autorizada!");
-        }
+        return Stream.of(findById(id))
+                .peek(l -> log.info("Transaction reversed on the following ID:" + id))
+                .filter(transacaoModel -> transacaoModel.get().getDescricaoModel().getStatus() == Status.AUTORIZADO)
+                .peek(transacaoModel -> transacaoModel.get().getDescricaoModel().setStatus(Status.CANCELADO))
+                .map(transacaoModel -> transacaoRepository.save(findById(id).get()))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public Page<TransacaoModel> findAll(Pageable pageable) {
-        Page<TransacaoModel> findAll = Optional.of(transacaoRepository.findAll(pageable))
-                .orElseThrow(() -> new RequestExceptionNotFound("Não há dados na base."));
-        log.info("A search was carried out on the base.");
-        return findAll;
+        return Optional.of(transacaoRepository.findAll(pageable))
+                .stream()
+                .peek(l -> log.info("A search was carried out on the base."))
+                .findFirst()
+                .orElseThrow(() -> new transacaoNaoEncontrada("Não há dados na base."));
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
@@ -65,7 +64,7 @@ public class TransacaoService {
                 .stream()
                 .peek(l -> log.info("The following id was searched: " + id))
                 .findFirst()
-                .orElseThrow(() -> new RequestExceptionNotFound("ID não existente !")));
+                .orElseThrow(() -> new transacaoNaoEncontrada("ID não existente !")));
     }
 
     public void deleteById(UUID id) {
@@ -75,11 +74,9 @@ public class TransacaoService {
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoExistente = findById(id).get();
-        TransacaoModel transacaoModelNova = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoModelNova, transacaoExistente, "id");
-        transacaoRepository.save(transacaoExistente);
-        log.info("Updated transaction.");
-        return transacaoExistente;
+        TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
+        BeanUtils.copyProperties(transacaoModel, transacaoExistente, "id");
+        return transacaoRepository.save(transacaoExistente);
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
