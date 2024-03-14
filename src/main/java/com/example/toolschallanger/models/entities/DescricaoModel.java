@@ -26,6 +26,7 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
+        geraValoresValidos();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -117,15 +118,11 @@ public class DescricaoModel {
     }
 
     public void geraValoresValidos() {
-        if (this.nsu == null && this.codigoAutorizacao == null && this.status == null) {
+        if (this.nsu == null || this.codigoAutorizacao == null || this.status == null) {
             verificaValorNegativo();
             geraNsuValido();
             geraCodigoAutorizacaoValido();
             verificaStatus();
-        } else {
-            this.nsu = getNsu();
-            this.codigoAutorizacao = getCodigoAutorizacao();
-            this.status = getStatus();
         }
     }
 

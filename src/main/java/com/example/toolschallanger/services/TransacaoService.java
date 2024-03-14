@@ -1,6 +1,5 @@
 package com.example.toolschallanger.services;
 
-
 import com.example.toolschallanger.exceptions.transacaoNaoEncontrada;
 import com.example.toolschallanger.exceptions.transacaoBadRequest;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
@@ -10,6 +9,9 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -28,14 +30,13 @@ public class TransacaoService {
 
     private static final Logger log = LoggerFactory.getLogger(TransacaoService.class);
 
-    public TransacaoService(TransacaoRepository transacaoRepository) {
+    public TransacaoService(TransacaoRepository transacaoRepository, ObjectMapper objectMapper) {
         this.transacaoRepository = transacaoRepository;
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         return Stream.of(transacaoRecordDTO)
                 .map(this::converterDtoEmEntity)
-                .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
                 .findFirst()
@@ -74,9 +75,18 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
+        return Stream.of(findById(id).get())
+                .peek(merge -> BeanUtils.copyProperties(converterDtoEmEntity(transacaoRecordDTO), merge, "id"))
+                .map(transacaoRepository::save)
+                .peek(l -> log.info("Merged transaction with successfully."))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public TransacaoModel patchById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoExistente = findById(id).get();
         TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        BeanUtils.copyProperties(transacaoModel, transacaoExistente, "id");
+        transacaoExistente.setId(id);
         return transacaoRepository.save(transacaoExistente);
     }
 

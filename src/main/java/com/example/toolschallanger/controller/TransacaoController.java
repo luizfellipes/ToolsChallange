@@ -73,4 +73,11 @@ public class TransacaoController {
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 
+    @PatchMapping("/{id}")
+    @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
+    public ResponseEntity<TransacaoModel> patch(@PathVariable(value = "id") UUID id, @RequestBody TransacaoRecordDTO transacaoRecordDto)  {
+        log.info("Updating the following ID: " + id);
+        return ResponseEntity.status(HttpStatus.OK).body(transacaoService.patchById(id, transacaoRecordDto));
+    }
+
 }
