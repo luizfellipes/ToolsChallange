@@ -2,11 +2,12 @@ package com.example.toolschallanger.controller;
 
 
 import com.example.toolschallanger.exceptions.RequestsValidation;
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,7 +128,7 @@ public class TransacaoControllerTest {
     //deve testar caso de falha
     @Test
     public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
-        when(transacaoService.save(any())).thenThrow(new IllegalArgumentException());
+        when(transacaoService.save(any())).thenThrow(new TransacaoBadRequest());
 
         mockMvc.perform(post("/transacoes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +140,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.updateById(any(), any())).thenThrow(new IllegalArgumentException());
+        when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoBadRequest());
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +152,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        doThrow(EntityNotFoundException.class).when(transacaoService).findAll(any());
+        doThrow(TransacaoNaoEncontrada.class).when(transacaoService).findAll(any());
 
         mockMvc.perform(get("/transacoes"))
                 .andDo(print())
@@ -161,7 +162,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new EntityNotFoundException());
+        when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
@@ -171,7 +172,7 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        doThrow(EntityNotFoundException.class).when(transacaoService).deleteById(any());
+        doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

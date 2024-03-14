@@ -1,7 +1,7 @@
 package com.example.toolschallanger.models.entities;
 
 
-import com.example.toolschallanger.exceptions.transacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.FormaPagamento;
 import jakarta.persistence.*;
 
@@ -42,7 +42,7 @@ public class FormaPagamentoModel {
     public void validaParcela(Double valor) {
         if (this.parcelas <= 1 || valor < 100) {
             if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {
-                throw new transacaoBadRequest("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
+                throw new TransacaoBadRequest("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
             }
         }
     }

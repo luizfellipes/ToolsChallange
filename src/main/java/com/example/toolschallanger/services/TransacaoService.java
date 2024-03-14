@@ -1,7 +1,7 @@
 package com.example.toolschallanger.services;
 
-import com.example.toolschallanger.exceptions.transacaoNaoEncontrada;
-import com.example.toolschallanger.exceptions.transacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
@@ -10,8 +10,6 @@ import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,7 +38,7 @@ public class TransacaoService {
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
                 .findFirst()
-                .orElseThrow(transacaoBadRequest::new);
+                .orElseThrow(TransacaoBadRequest::new);
     }
 
     public TransacaoModel estorno(UUID id) {
@@ -50,7 +48,7 @@ public class TransacaoService {
                 .peek(transacaoModel -> transacaoModel.get().getDescricaoModel().setStatus(Status.CANCELADO))
                 .map(transacaoModel -> transacaoRepository.save(findById(id).get()))
                 .findFirst()
-                .orElseThrow(transacaoBadRequest::new);
+                .orElseThrow(TransacaoBadRequest::new);
     }
 
     public Page<TransacaoModel> findAll(Pageable pageable) {
@@ -58,7 +56,7 @@ public class TransacaoService {
                 .stream()
                 .peek(l -> log.info("A search was carried out on the base."))
                 .findFirst()
-                .orElseThrow(() -> new transacaoNaoEncontrada("Não há dados na base."));
+                .orElseThrow(() -> new TransacaoNaoEncontrada("Não há dados na base."));
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
@@ -66,7 +64,7 @@ public class TransacaoService {
                 .stream()
                 .peek(l -> log.info("The following id was searched: " + id))
                 .findFirst()
-                .orElseThrow(() -> new transacaoNaoEncontrada("ID não existente !")));
+                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));
     }
 
     public void deleteById(UUID id) {

@@ -1,5 +1,6 @@
 package com.example.toolschallanger.entities;
 
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.Status;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class DescricaoModelTest {
 
     @Test
     public void deveTestarVerificaValorNegativo() {
-        Assertions.assertThrows(RuntimeException.class, () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo());
+        Assertions.assertThrows(TransacaoBadRequest.class, () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo());
     }
 
     @Test

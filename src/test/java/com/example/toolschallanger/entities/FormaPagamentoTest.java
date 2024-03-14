@@ -1,5 +1,6 @@
 package com.example.toolschallanger.entities;
 
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +19,7 @@ public class FormaPagamentoTest {
 
     @Test
     public void deveDarErroAoValidarParcela() {
-        Assertions.assertThrows(RuntimeException.class, () -> responseMockModelParceladoValorBaixo().getFormaPagamentoModel().validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor()));
+        Assertions.assertThrows(TransacaoBadRequest.class, () -> responseMockModelParceladoValorBaixo().getFormaPagamentoModel().validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor()));
     }
 
 }

@@ -1,6 +1,6 @@
 package com.example.toolschallanger.models.entities;
 
-import com.example.toolschallanger.exceptions.transacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
 
@@ -113,7 +113,7 @@ public class DescricaoModel {
 
     public void verificaValorNegativo() {
         if (this.valor < 0.0) {
-            throw new transacaoBadRequest("Valores negativos não são permitidos !");
+            throw new TransacaoBadRequest("Valores negativos não são permitidos !");
         }
     }
 
