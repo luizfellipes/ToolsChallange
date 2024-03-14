@@ -28,13 +28,13 @@ public class RequestsValidation {
     }
 
     @ExceptionHandler(transacaoBadRequest.class)
-    public ResponseEntity<Object> transacaoBadRequest(transacaoBadRequest exception) {
+    public ResponseEntity<Object> transacao400(transacaoBadRequest exception) {
         log.error("Error in the request.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
     }
 
     @ExceptionHandler(transacaoNaoEncontrada.class)
-    public ResponseEntity<Object> transacaoNaoEncontrada(transacaoNaoEncontrada exception) {
+    public ResponseEntity<Object> transacao404(transacaoNaoEncontrada exception) {
         log.error("Not Found a transaction.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponsePersonalizada(HttpStatus.NOT_FOUND.value(), exception.getMessage()));
     }
