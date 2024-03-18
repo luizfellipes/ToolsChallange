@@ -9,7 +9,6 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static com.example.toolschallanger.config.CopyPropertiesConfig.myCopyProperties;
+
 
 @Service
 public class TransacaoService {
@@ -28,13 +29,14 @@ public class TransacaoService {
 
     private static final Logger log = LoggerFactory.getLogger(TransacaoService.class);
 
-    public TransacaoService(TransacaoRepository transacaoRepository, ObjectMapper objectMapper) {
+    public TransacaoService(TransacaoRepository transacaoRepository) {
         this.transacaoRepository = transacaoRepository;
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         return Stream.of(transacaoRecordDTO)
                 .map(this::converterDtoEmEntity)
+                .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
                 .findFirst()
@@ -73,8 +75,11 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
+        TransacaoModel transacaoUpdate = converterDtoEmEntity(transacaoRecordDTO);
         return Stream.of(findById(id).get())
-                .peek(merge -> BeanUtils.copyProperties(converterDtoEmEntity(transacaoRecordDTO), merge, "id"))
+                .peek(transacao -> myCopyProperties(transacaoUpdate.getDescricaoModel(), transacao.getDescricaoModel()))
+                .peek(transacao -> myCopyProperties(transacaoUpdate.getFormaPagamentoModel(), transacao.getFormaPagamentoModel()))
+                .peek(transacao -> BeanUtils.copyProperties(transacaoUpdate, transacao, "id", "descricaoModel", "formaPagamentoModel"))
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Merged transaction with successfully."))
                 .findFirst()
@@ -82,10 +87,15 @@ public class TransacaoService {
     }
 
     public TransacaoModel patchById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoExistente = findById(id).get();
-        TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        transacaoExistente.setId(id);
-        return transacaoRepository.save(transacaoExistente);
+        TransacaoModel transacaoParaPatching = converterDtoEmEntity(transacaoRecordDTO);
+        return Stream.of(findById(id).get())
+                .peek(transacao -> myCopyProperties(transacaoParaPatching.getDescricaoModel(), transacao.getDescricaoModel()))
+                .peek(transacao -> myCopyProperties(transacaoParaPatching.getFormaPagamentoModel(), transacao.getFormaPagamentoModel()))
+                .peek(transacao -> BeanUtils.copyProperties(transacaoParaPatching, transacao, "id", "descricaoModel", "formaPagamentoModel"))
+                .map(transacaoRepository::save)
+                .peek(l -> log.info("Merged transaction with successfully."))
+                .findFirst()
+                .orElseThrow();
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {

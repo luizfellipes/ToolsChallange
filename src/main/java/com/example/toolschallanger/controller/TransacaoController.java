@@ -46,7 +46,7 @@ public class TransacaoController {
 
     @GetMapping
     @Operation(summary = "Lista as transações", description = "Busca todas as transações", tags = "Transações")
-    public ResponseEntity<Page<TransacaoModel>> getAll(@PageableDefault(size=10) Pageable pageable) {
+    public ResponseEntity<Page<TransacaoModel>> getAll(@PageableDefault(size = 10) Pageable pageable) {
         log.info("Seaching all transactions.");
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findAll(pageable));
     }
@@ -68,15 +68,15 @@ public class TransacaoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
-    public ResponseEntity<TransacaoModel> update(@PathVariable(value = "id") UUID id, @RequestBody TransacaoRecordDTO transacaoRecordDto) {
+    public ResponseEntity<TransacaoModel> update(@PathVariable(value = "id") UUID id, @Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
         log.info("Updating the following ID: " + id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
-    public ResponseEntity<TransacaoModel> patch(@PathVariable(value = "id") UUID id, @RequestBody TransacaoRecordDTO transacaoRecordDto)  {
-        log.info("Updating the following ID: " + id);
+    public ResponseEntity<TransacaoModel> patch(@PathVariable(value = "id") UUID id, @RequestBody TransacaoRecordDTO transacaoRecordDto) {
+        log.info("Pacthing the following ID: " + id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.patchById(id, transacaoRecordDto));
     }
 
