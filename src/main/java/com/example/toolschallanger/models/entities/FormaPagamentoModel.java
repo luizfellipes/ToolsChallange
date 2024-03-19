@@ -6,7 +6,6 @@ import com.example.toolschallanger.models.enuns.FormaPagamento;
 import jakarta.persistence.*;
 
 
-
 //@Entity
 //@Table(name = "TB_FORMA_PAGAMENTO")
 public class FormaPagamentoModel {
@@ -40,7 +39,7 @@ public class FormaPagamentoModel {
     }
 
     public void validaParcela(Double valor) {
-        if (this.parcelas <= 1 || valor < 100) {
+        if (this.tipo == null || this.parcelas == null || this.parcelas <= 1 || valor < 100) {
             if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {
                 throw new TransacaoBadRequest("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
             }

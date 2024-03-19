@@ -26,6 +26,7 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
+        verificaValorNegativo();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {

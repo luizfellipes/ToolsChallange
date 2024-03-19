@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static com.example.toolschallanger.config.CopyPropertiesConfig.getNullPropertyNames;
 import static com.example.toolschallanger.config.CopyPropertiesConfig.myCopyProperties;
 
 
@@ -34,8 +35,7 @@ public class TransacaoService {
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
-        return Stream.of(transacaoRecordDTO)
-                .map(this::converterDtoEmEntity)
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
                 .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
                 .map(transacaoRepository::save)
                 .peek(l -> log.info("Saved transaction."))
@@ -77,23 +77,24 @@ public class TransacaoService {
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoUpdate = converterDtoEmEntity(transacaoRecordDTO);
         return Stream.of(findById(id).get())
+                .peek(transacao -> myCopyProperties(transacaoUpdate.getCartao(), transacao.getCartao()))
                 .peek(transacao -> myCopyProperties(transacaoUpdate.getDescricaoModel(), transacao.getDescricaoModel()))
                 .peek(transacao -> myCopyProperties(transacaoUpdate.getFormaPagamentoModel(), transacao.getFormaPagamentoModel()))
-                .peek(transacao -> BeanUtils.copyProperties(transacaoUpdate, transacao, "id", "descricaoModel", "formaPagamentoModel"))
                 .map(transacaoRepository::save)
-                .peek(l -> log.info("Merged transaction with successfully."))
+                .peek(l -> log.info("Updated transaction with successfully."))
                 .findFirst()
                 .orElseThrow();
     }
 
     public TransacaoModel patchById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoParaPatching = converterDtoEmEntity(transacaoRecordDTO);
-        return Stream.of(findById(id).get())
-                .peek(transacao -> myCopyProperties(transacaoParaPatching.getDescricaoModel(), transacao.getDescricaoModel()))
-                .peek(transacao -> myCopyProperties(transacaoParaPatching.getFormaPagamentoModel(), transacao.getFormaPagamentoModel()))
-                .peek(transacao -> BeanUtils.copyProperties(transacaoParaPatching, transacao, "id", "descricaoModel", "formaPagamentoModel"))
-                .map(transacaoRepository::save)
-                .peek(l -> log.info("Merged transaction with successfully."))
+        TransacaoModel transacaoPatching = findById(id).get();
+        return Stream.of(transacaoRecordDTO)
+                .map(this::converterDtoEmEntity)
+                .peek(transacao -> transacaoPatching.setCartao(transacao.getCartao() != null ? transacao.getCartao() : transacaoPatching.getCartao()))
+                .peek(transacao -> myCopyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel()))
+                .peek(transacao -> myCopyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel()))
+                .map(transacao -> transacaoRepository.save(transacaoPatching))
+                .peek(l -> log.info("Updated transaction with successfully."))
                 .findFirst()
                 .orElseThrow();
     }

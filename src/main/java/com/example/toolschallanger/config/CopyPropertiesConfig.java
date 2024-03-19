@@ -4,16 +4,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import java.beans.PropertyDescriptor;
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class CopyPropertiesConfig {
 
-    private static String[] getNullPropertyNames(Object source) {
+    public static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
-        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
-        Set<String> emptyNames = new HashSet<String>();
-        for (java.beans.PropertyDescriptor pd : pds) {
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
             Object srcValue = src.getPropertyValue(pd.getName());
             if (srcValue == null) emptyNames.add(pd.getName());
         }
@@ -21,8 +22,9 @@ public abstract class CopyPropertiesConfig {
         return emptyNames.toArray(result);
     }
 
-    public static void myCopyProperties(Object src, Object target) {
+    public static Object myCopyProperties(Object src, Object target) {
         BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+        return target;
     }
 
 }
