@@ -71,4 +71,6 @@ public class TransacaoModel implements Serializable {
     public void setFormaPagamentoModel(FormaPagamentoModel formaPagamentoModel) {
         this.formaPagamentoModel = formaPagamentoModel;
     }
+
+
 }

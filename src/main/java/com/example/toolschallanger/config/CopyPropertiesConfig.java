@@ -10,7 +10,11 @@ import java.util.Set;
 
 public abstract class CopyPropertiesConfig {
 
-    public static String[] getNullPropertyNames(Object source) {
+    public static void myCopyProperties(Object src, Object target) {
+        BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+    }
+
+    private static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
         PropertyDescriptor[] pds = src.getPropertyDescriptors();
         Set<String> emptyNames = new HashSet<>();
@@ -20,11 +24,6 @@ public abstract class CopyPropertiesConfig {
         }
         String[] result = new String[emptyNames.size()];
         return emptyNames.toArray(result);
-    }
-
-    public static Object myCopyProperties(Object src, Object target) {
-        BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
-        return target;
     }
 
 }

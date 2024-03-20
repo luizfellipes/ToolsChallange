@@ -112,7 +112,7 @@ public class DescricaoModel {
     }
 
     public void verificaValorNegativo() {
-        if (this.valor < 0.0) {
+        if (this.valor != null && this.valor < 0.0) {
             throw new TransacaoBadRequest("Valores negativos não são permitidos !");
         }
     }

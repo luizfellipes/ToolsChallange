@@ -11,7 +11,6 @@ import com.example.toolschallanger.repositories.TransacaoRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.example.toolschallanger.config.CopyPropertiesConfig.getNullPropertyNames;
 import static com.example.toolschallanger.config.CopyPropertiesConfig.myCopyProperties;
 
 
@@ -38,17 +36,17 @@ public class TransacaoService {
         return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
                 .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
                 .map(transacaoRepository::save)
-                .peek(l -> log.info("Saved transaction."))
+                .peek(l -> log.info("Saved transaction with successfully."))
                 .findFirst()
                 .orElseThrow(TransacaoBadRequest::new);
     }
 
     public TransacaoModel estorno(UUID id) {
-        return Stream.of(findById(id))
+        return Stream.of(findById(id).get())
                 .peek(l -> log.info("Transaction reversed on the following ID:" + id))
-                .filter(transacaoModel -> transacaoModel.get().getDescricaoModel().getStatus() == Status.AUTORIZADO)
-                .peek(transacaoModel -> transacaoModel.get().getDescricaoModel().setStatus(Status.CANCELADO))
-                .map(transacaoModel -> transacaoRepository.save(findById(id).get()))
+                .filter(transacaoModel -> transacaoModel.getDescricaoModel().getStatus() == Status.AUTORIZADO)
+                .peek(transacaoModel -> transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO))
+                .map(transacaoRepository::save)
                 .findFirst()
                 .orElseThrow(TransacaoBadRequest::new);
     }
@@ -75,12 +73,13 @@ public class TransacaoService {
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoUpdate = converterDtoEmEntity(transacaoRecordDTO);
-        return Stream.of(findById(id).get())
-                .peek(transacao -> myCopyProperties(transacaoUpdate.getCartao(), transacao.getCartao()))
-                .peek(transacao -> myCopyProperties(transacaoUpdate.getDescricaoModel(), transacao.getDescricaoModel()))
-                .peek(transacao -> myCopyProperties(transacaoUpdate.getFormaPagamentoModel(), transacao.getFormaPagamentoModel()))
-                .map(transacaoRepository::save)
+        TransacaoModel transacaoExistente = findById(id).get();
+        return Stream.of(transacaoRecordDTO)
+                .map(this::converterDtoEmEntity)
+                .peek(transacao -> myCopyProperties(transacao.getCartao(), transacaoExistente.getCartao()))
+                .peek(transacao -> myCopyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel()))
+                .peek(transacao -> myCopyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel()))
+                .map(transacao -> transacaoRepository.save(transacaoExistente))
                 .peek(l -> log.info("Updated transaction with successfully."))
                 .findFirst()
                 .orElseThrow();
@@ -94,15 +93,19 @@ public class TransacaoService {
                 .peek(transacao -> myCopyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel()))
                 .peek(transacao -> myCopyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel()))
                 .map(transacao -> transacaoRepository.save(transacaoPatching))
-                .peek(l -> log.info("Updated transaction with successfully."))
+                .peek(l -> log.info("Patching transaction with successfully."))
                 .findFirst()
                 .orElseThrow();
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        return new TransacaoModel(transacaoRecordDTO.cartao(),
-                new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
-                new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
+        return Stream.ofNullable(transacaoRecordDTO).
+                map(dto -> new TransacaoModel(dto.cartao(),
+                        new DescricaoModel(dto.descricaoDePagamento().valor(),
+                                dto.descricaoDePagamento().dataHora(),
+                                dto.descricaoDePagamento().estabelecimento()),
+                        new FormaPagamentoModel(dto.formaDePagamento().tipo(),
+                                dto.formaDePagamento().parcelas()))).findFirst().orElse(null);
     }
 
 }
