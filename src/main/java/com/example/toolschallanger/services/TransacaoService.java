@@ -18,8 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.example.toolschallanger.config.CopyPropertiesConfig.myCopyProperties;
-
+import static com.example.toolschallanger.config.CopyPropertiesConfig.copyProperties;
 
 @Service
 public class TransacaoService {
@@ -76,9 +75,9 @@ public class TransacaoService {
         TransacaoModel transacaoExistente = findById(id).get();
         return Stream.of(transacaoRecordDTO)
                 .map(this::converterDtoEmEntity)
-                .peek(transacao -> myCopyProperties(transacao.getCartao(), transacaoExistente.getCartao()))
-                .peek(transacao -> myCopyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel()))
-                .peek(transacao -> myCopyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel()))
+                .peek(transacao -> copyProperties(transacao.getCartao(), transacaoExistente.getCartao()))
+                .peek(transacao -> copyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel()))
+                .peek(transacao -> copyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel()))
                 .map(transacao -> transacaoRepository.save(transacaoExistente))
                 .peek(l -> log.info("Updated transaction with successfully."))
                 .findFirst()
@@ -90,8 +89,8 @@ public class TransacaoService {
         return Stream.of(transacaoRecordDTO)
                 .map(this::converterDtoEmEntity)
                 .peek(transacao -> transacaoPatching.setCartao(transacao.getCartao() != null ? transacao.getCartao() : transacaoPatching.getCartao()))
-                .peek(transacao -> myCopyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel()))
-                .peek(transacao -> myCopyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel()))
+                .peek(transacao -> copyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel()))
+                .peek(transacao -> copyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel()))
                 .map(transacao -> transacaoRepository.save(transacaoPatching))
                 .peek(l -> log.info("Patching transaction with successfully."))
                 .findFirst()
@@ -99,13 +98,18 @@ public class TransacaoService {
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        return Stream.ofNullable(transacaoRecordDTO).
-                map(dto -> new TransacaoModel(dto.cartao(),
-                        new DescricaoModel(dto.descricaoDePagamento().valor(),
-                                dto.descricaoDePagamento().dataHora(),
-                                dto.descricaoDePagamento().estabelecimento()),
-                        new FormaPagamentoModel(dto.formaDePagamento().tipo(),
-                                dto.formaDePagamento().parcelas()))).findFirst().orElse(null);
+        DescricaoModel descricaoModel = null;
+        FormaPagamentoModel formaPagamentoModel = null;
+        if (transacaoRecordDTO.descricaoDePagamento() != null) {
+            descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(),
+                    transacaoRecordDTO.descricaoDePagamento().dataHora(),
+                    transacaoRecordDTO.descricaoDePagamento().estabelecimento());
+        }
+        if (transacaoRecordDTO.formaDePagamento() != null) {
+            formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(),
+                    transacaoRecordDTO.formaDePagamento().parcelas());
+        }
+        return new TransacaoModel(transacaoRecordDTO.cartao(), descricaoModel, formaPagamentoModel);
     }
 
 }

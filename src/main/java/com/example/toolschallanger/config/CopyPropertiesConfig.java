@@ -10,8 +10,10 @@ import java.util.Set;
 
 public abstract class CopyPropertiesConfig {
 
-    public static void myCopyProperties(Object src, Object target) {
-        BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
+    public static void copyProperties(Object origem, Object alvo) {
+        if (origem != null && alvo != null) {
+            BeanUtils.copyProperties(origem, alvo, getNullPropertyNames(origem));
+        }
     }
 
     private static String[] getNullPropertyNames(Object source) {

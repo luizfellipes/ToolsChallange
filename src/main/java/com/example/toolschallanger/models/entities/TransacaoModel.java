@@ -26,14 +26,14 @@ public class TransacaoModel implements Serializable {
     }
 
     public TransacaoModel(Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
-        formaPagamentoModel.validaParcela(descricaoModel.getValor());
+        validacaoParcela();
         this.cartao = cartao;
         this.descricaoModel = descricaoModel;
         this.formaPagamentoModel = formaPagamentoModel;
     }
 
     public TransacaoModel(UUID id, Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
-        formaPagamentoModel.validaParcela(descricaoModel.getValor());
+        validacaoParcela();
         this.id = id;
         this.cartao = cartao;
         this.descricaoModel = descricaoModel;
@@ -72,5 +72,11 @@ public class TransacaoModel implements Serializable {
         this.formaPagamentoModel = formaPagamentoModel;
     }
 
+
+    public void validacaoParcela() {
+        if (this.formaPagamentoModel != null && this.descricaoModel != null) {
+            this.formaPagamentoModel.validaParcela(this.descricaoModel.getValor());
+        }
+    }
 
 }
