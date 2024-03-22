@@ -98,18 +98,11 @@ public class TransacaoService {
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        DescricaoModel descricaoModel = null;
-        FormaPagamentoModel formaPagamentoModel = null;
-        if (transacaoRecordDTO.descricaoDePagamento() != null) {
-            descricaoModel = new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(),
-                    transacaoRecordDTO.descricaoDePagamento().dataHora(),
-                    transacaoRecordDTO.descricaoDePagamento().estabelecimento());
-        }
-        if (transacaoRecordDTO.formaDePagamento() != null) {
-            formaPagamentoModel = new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(),
-                    transacaoRecordDTO.formaDePagamento().parcelas());
-        }
-        return new TransacaoModel(transacaoRecordDTO.cartao(), descricaoModel, formaPagamentoModel);
+        return new TransacaoModel(transacaoRecordDTO.cartao(),
+                transacaoRecordDTO.descricaoDePagamento() != null ?
+                        new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()) : null,
+                transacaoRecordDTO.formaDePagamento() != null ?
+                        new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()) : null);
     }
 
 }
