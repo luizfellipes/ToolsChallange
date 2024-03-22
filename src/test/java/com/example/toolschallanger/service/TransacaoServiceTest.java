@@ -48,9 +48,10 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveTestarEstorno() {
-        when(transacaoService.estorno(any())).thenReturn(requestMockModel());
+        TransacaoModel transacaoModel = responseMockModel();
+        when(transacaoService.estorno(any())).thenReturn(transacaoModel);
 
-        Status status = responseMockModel().getDescricaoModel().getStatus();
+        Status status = transacaoModel.getDescricaoModel().getStatus();
 
         Assertions.assertEquals(Status.CANCELADO, status);
     }
@@ -92,6 +93,16 @@ public class TransacaoServiceTest {
         Assertions.assertEquals(transacaoModel, transacaoAtualizada);
     }
 
+    @Test
+    public void deveTestarPatch() {
+        TransacaoModel transacaoModel = responseMockModel();
+        when(transacaoService.patchById(any(), any())).thenReturn(transacaoModel);
+
+        TransacaoModel transacaoCorrigida = transacaoService.patchById(responseMockModel().getId(), responseMockDTO());
+
+        Assertions.assertEquals(transacaoModel, transacaoCorrigida);
+    }
+
 
     //Caso de falha
     @Test
@@ -127,7 +138,7 @@ public class TransacaoServiceTest {
         TransacaoModel transacaoModel = new TransacaoModel();
         doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(transacaoModel.getId());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, ()-> transacaoService.deleteById(transacaoModel.getId()));
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.deleteById(transacaoModel.getId()));
     }
 
     @Test
@@ -135,6 +146,13 @@ public class TransacaoServiceTest {
         when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
+    }
+
+    @Test
+    public void deveDarErroAoRealizarUmPatch() {
+        when(transacaoService.patchById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockNullDTO()));
     }
 
 }

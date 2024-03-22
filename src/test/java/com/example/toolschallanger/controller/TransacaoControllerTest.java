@@ -4,6 +4,7 @@ package com.example.toolschallanger.controller;
 import com.example.toolschallanger.exceptions.RequestsValidation;
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
+import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -88,6 +89,20 @@ public class TransacaoControllerTest {
                         .content(objectMapper.writeValueAsString(responseMockDTO())))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricaoModel.estabelecimento").value(responseMockDTO().descricaoDePagamento().estabelecimento()))
+                .andReturn();
+    }
+
+    @Test
+    public void deveRealizarUmPatch() throws Exception {
+        when(transacaoService.patchById(any(), any())).thenReturn(responseMockModel());
+
+        mockMvc.perform(patch("/transacoes/" + requestMockModel().getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(responseMockDTO())))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricaoModel.estabelecimento").value(responseMockDTO().descricaoDePagamento().estabelecimento()))
                 .andReturn();
     }
 
@@ -103,7 +118,8 @@ public class TransacaoControllerTest {
 
     @Test
     public void deveTestarTransacaoGetOne() throws Exception {
-        when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+        TransacaoModel transacaoModel = requestMockModel();
+        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
 
         mockMvc.perform(get("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
