@@ -42,7 +42,7 @@ public class TransacaoService {
 
     public TransacaoModel estorno(UUID id) {
         return Stream.of(findById(id).get())
-                .peek(l -> log.info("Transaction reversed on the following ID:" + id))
+                .peek(l -> log.info("Transaction reversed on the following ID: {}", id))
                 .filter(transacaoModel -> transacaoModel.getDescricaoModel().getStatus() == Status.AUTORIZADO)
                 .peek(transacaoModel -> transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO))
                 .map(transacaoRepository::save)
@@ -61,7 +61,7 @@ public class TransacaoService {
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.ofNullable(transacaoRepository.findById(id)
                 .stream()
-                .peek(l -> log.info("The following id was searched: " + id))
+                .peek(l -> log.info("The following id was searched:{}", id))
                 .findFirst()
                 .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));
     }

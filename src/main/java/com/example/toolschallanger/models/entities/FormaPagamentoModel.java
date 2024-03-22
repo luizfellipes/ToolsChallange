@@ -5,10 +5,12 @@ import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.FormaPagamento;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 
 //@Entity
 //@Table(name = "TB_FORMA_PAGAMENTO")
-public class FormaPagamentoModel {
+public class FormaPagamentoModel implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private FormaPagamento tipo;

@@ -34,14 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(SpringExtension.class)
-public class TransacaoControllerTest {
+class TransacaoControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private TransacaoService transacaoService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.transacaoService = mock(TransacaoService.class);
         TransacaoController transacaoController = new TransacaoController(transacaoService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
@@ -54,7 +54,7 @@ public class TransacaoControllerTest {
 
     //deve testar caso de sucesso
     @Test
-    public void deveCriarUmaNovaTransacao() throws Exception {
+    void deveCriarUmaNovaTransacao() throws Exception {
         when(transacaoService.save(any())).thenReturn(requestMockModel());
 
         mockMvc.perform(post("/transacoes")
@@ -68,7 +68,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveRealizarUmEstorno() throws Exception {
+    void deveRealizarUmEstorno() throws Exception {
         when(transacaoService.estorno(any())).thenReturn(responseMockModel());
 
         mockMvc.perform(post("/transacoes/estorno/" + requestMockModel().getId())
@@ -81,7 +81,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveRealizarUmUpdate() throws Exception {
+    void deveRealizarUmUpdate() throws Exception {
         when(transacaoService.updateById(any(), any())).thenReturn(responseMockModel());
 
         mockMvc.perform(put("/transacoes/" + requestMockModel().getId())
@@ -94,7 +94,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveRealizarUmPatch() throws Exception {
+    void deveRealizarUmPatch() throws Exception {
         when(transacaoService.patchById(any(), any())).thenReturn(responseMockModel());
 
         mockMvc.perform(patch("/transacoes/" + requestMockModel().getId())
@@ -107,7 +107,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveTestarTransacaoGetAll() throws Exception {
+    void deveTestarTransacaoGetAll() throws Exception {
         when(transacaoService.findAll(any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/transacoes?size=5?page=0"))
@@ -117,7 +117,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveTestarTransacaoGetOne() throws Exception {
+    void deveTestarTransacaoGetOne() throws Exception {
         TransacaoModel transacaoModel = requestMockModel();
         when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
 
@@ -130,7 +130,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveTestarTransacaoDelete() throws Exception {
+    void deveTestarTransacaoDelete() throws Exception {
         when(transacaoService.findById(any())).thenReturn(null);
 
         mockMvc.perform(delete("/transacoes/" + requestMockModel().getId())
@@ -143,7 +143,7 @@ public class TransacaoControllerTest {
 
     //deve testar caso de falha
     @Test
-    public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
+    void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
         when(transacaoService.save(any())).thenThrow(new TransacaoBadRequest());
 
         mockMvc.perform(post("/transacoes")
@@ -155,7 +155,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
+    void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
         when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoBadRequest());
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
@@ -167,7 +167,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
+    void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
         doThrow(TransacaoNaoEncontrada.class).when(transacaoService).findAll(any());
 
         mockMvc.perform(get("/transacoes"))
@@ -177,7 +177,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
+    void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
         when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
@@ -187,7 +187,7 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
+    void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
         doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))

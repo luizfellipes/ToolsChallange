@@ -40,7 +40,7 @@ public class TransacaoController {
     @PostMapping("/estorno/{id}")
     @Operation(summary = "Estorno", description = "Estorna as transacoes autorizadas ou erradas transações", tags = "Transações")
     public ResponseEntity<TransacaoModel> estorno(@PathVariable(value = "id") UUID id) {
-        log.info("Reversing the following ID: " + id);
+        log.info("Reversing the following ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.estorno(id));
     }
 
@@ -54,14 +54,14 @@ public class TransacaoController {
     @GetMapping("/{id}")
     @Operation(summary = "Lista as transações por ID", description = "Busca as transações por ID", tags = "Transações")
     public ResponseEntity<Optional<TransacaoModel>> getOne(@PathVariable(value = "id") UUID id) {
-        log.info("Fetching the following ID: " + id);
+        log.info("Fetching the following ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.findById(id));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleta por transações por ID", description = "Deleta as transações por ID", tags = "Transações")
-    public ResponseEntity<?> delete(@PathVariable(value = "id") UUID id) {
-        log.info("Deleting the following ID: " + id);
+    public ResponseEntity<TransacaoModel> delete(@PathVariable(value = "id") UUID id) {
+        log.info("Deleting the following ID:{}", id);
         transacaoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -69,14 +69,14 @@ public class TransacaoController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
     public ResponseEntity<TransacaoModel> update(@PathVariable(value = "id") UUID id, @Valid @RequestBody TransacaoRecordDTO transacaoRecordDto) {
-        log.info("Updating the following ID: " + id);
+        log.info("Updating the following ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.updateById(id, transacaoRecordDto));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Atualiza transações por ID", description = "Atualiza as transações por ID", tags = "Transações")
     public ResponseEntity<TransacaoModel> patch(@PathVariable(value = "id") UUID id, @RequestBody TransacaoRecordDTO transacaoRecordDto) {
-        log.info("Pacthing the following ID: " + id);
+        log.info("Pacthing the following ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(transacaoService.patchById(id, transacaoRecordDto));
     }
 

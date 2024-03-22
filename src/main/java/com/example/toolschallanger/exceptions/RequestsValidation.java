@@ -23,7 +23,7 @@ public class RequestsValidation {
     private ResponseEntity<Object> validaCamposNulosOuVazio(MethodArgumentNotValidException exception) {
         Map<String, Object> camposVazios = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(erro -> camposVazios.put(erro.getField(), erro.getDefaultMessage()));
-        log.error("The fields are empty. " + camposVazios);
+        log.error("The fields are empty. {}", camposVazios);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePersonalizada(HttpStatus.BAD_REQUEST.value(), camposVazios));
     }
 

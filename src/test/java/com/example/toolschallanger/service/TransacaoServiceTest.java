@@ -26,18 +26,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-public class TransacaoServiceTest {
+class TransacaoServiceTest {
 
     private TransacaoService transacaoService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.transacaoService = mock(TransacaoService.class);
     }
 
     //Caso de sucesso
     @Test
-    public void deveTestarSave() {
+    void deveTestarSave() {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.save(any())).thenReturn(transacaoModel);
 
@@ -47,7 +47,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarEstorno() {
+    void deveTestarEstorno() {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.estorno(any())).thenReturn(transacaoModel);
 
@@ -57,7 +57,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarFindAll() {
+    void deveTestarFindAll() {
         when(transacaoService.findAll(any())).thenReturn(Page.empty());
 
         boolean listaVazia = transacaoService.findAll(any()).isEmpty();
@@ -66,7 +66,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarFindById() {
+    void deveTestarFindById() {
         TransacaoModel transacaoModel = requestMockModel();
         when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
         Optional<TransacaoModel> transacao = transacaoService.findById(requestMockModel().getId());
@@ -75,7 +75,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarDelete() {
+    void deveTestarDelete() {
         TransacaoModel transacaoModel = requestMockModel();
         when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
 
@@ -84,7 +84,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarUpdate() {
+    void deveTestarUpdate() {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.updateById(any(), any())).thenReturn(transacaoModel);
 
@@ -94,7 +94,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveTestarPatch() {
+    void deveTestarPatch() {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.patchById(any(), any())).thenReturn(transacaoModel);
 
@@ -106,35 +106,35 @@ public class TransacaoServiceTest {
 
     //Caso de falha
     @Test
-    public void deveDarErroAoRealizarSave() {
+    void deveDarErroAoRealizarSave() {
         when(transacaoService.save(any(TransacaoRecordDTO.class))).thenThrow(new TransacaoBadRequest());
 
         Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.save(requestMockNullDTO()));
     }
 
     @Test
-    public void deveDarErroAoRealizarEstorno() {
+    void deveDarErroAoRealizarEstorno() {
         when(transacaoService.estorno(any())).thenThrow(new TransacaoBadRequest());
 
         Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.estorno(UUID.randomUUID()));
     }
 
     @Test
-    public void deveDarErroAoRealizarFindAll() {
+    void deveDarErroAoRealizarFindAll() {
         when(transacaoService.findAll(any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findAll(any()));
     }
 
     @Test
-    public void deveDarErroAoRealizarFindById() {
+    void deveDarErroAoRealizarFindById() {
         when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findById(UUID.randomUUID()));
     }
 
     @Test
-    public void deveDarErroAoRealizarDelete() {
+    void deveDarErroAoRealizarDelete() {
         TransacaoModel transacaoModel = new TransacaoModel();
         doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(transacaoModel.getId());
 
@@ -142,14 +142,14 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    public void deveDarErroAoRealizarUpdate() {
+    void deveDarErroAoRealizarUpdate() {
         when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
     }
 
     @Test
-    public void deveDarErroAoRealizarUmPatch() {
+    void deveDarErroAoRealizarUmPatch() {
         when(transacaoService.patchById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockNullDTO()));

@@ -9,16 +9,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static com.example.toolschallanger.mocks.MocksModel.*;
 
 @ExtendWith(SpringExtension.class)
-public class FormaPagamentoTest {
+class FormaPagamentoTest {
 
 
     @Test
-    public void deveValidaParcelaSucesso() {
+    void deveValidaParcelaSucesso() {
         Assertions.assertDoesNotThrow(() -> responseMockModelParceladoEmissor().getFormaPagamentoModel().validaParcela(responseMockModelParceladoEmissor().getDescricaoModel().getValor()));
     }
 
     @Test
-    public void deveDarErroAoValidarParcela() {
+    void deveDarErroAoValidarParcela() {
         Assertions.assertThrows(TransacaoBadRequest.class, () -> responseMockModelParceladoValorBaixo().getFormaPagamentoModel().validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor()));
     }
 
