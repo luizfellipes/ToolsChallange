@@ -9,35 +9,35 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static com.example.toolschallanger.mocks.MocksModel.*;
 
 @SpringBootTest
-public class DescricaoModelTest {
+class DescricaoModelTest {
 
     @Test
-    public void deveTestarStatusAUTORIZADO() {
+    void deveTestarStatusAUTORIZADO() {
         Assertions.assertEquals(Status.AUTORIZADO, responseMockModelParceladoEmissor().getDescricaoModel().verificaStatus());
     }
 
     @Test
-    public void deveTestarStatusNEGADO() {
+    void deveTestarStatusNEGADO() {
         Assertions.assertEquals(Status.NEGADO, responseMockModelStatusNegado().getDescricaoModel().getStatus());
     }
 
     @Test
-    public void deveDarErroStatusAutorizado() {
+    void deveDarErroStatusAutorizado() {
         Assertions.assertNotEquals(Status.NEGADO, responseMockModelParceladoEmissor().getDescricaoModel().verificaStatus());
     }
 
     @Test
-    public void deveDarErroStatusNegado() {
+    void deveDarErroStatusNegado() {
         Assertions.assertNotEquals(Status.AUTORIZADO, responseMockModelStatusNegado().getDescricaoModel().verificaStatus());
     }
 
     @Test
-    public void deveTestarVerificaValorNegativo() {
+    void deveTestarVerificaValorNegativo() {
         Assertions.assertThrows(TransacaoBadRequest.class, () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo());
     }
 
     @Test
-    public void deveDarErroAoVerificaValorNegativo() {
+    void deveDarErroAoVerificaValorNegativo() {
         Assertions.assertDoesNotThrow(() -> responseMockModelParceladoEmissor().getDescricaoModel().verificaValorNegativo());
     }
 

@@ -10,6 +10,9 @@ import java.util.Set;
 
 public abstract class CopyPropertiesConfig {
 
+    protected CopyPropertiesConfig() {
+    }
+
     public static void copyProperties(Object origem, Object alvo) {
         if (origem != null && alvo != null) {
             BeanUtils.copyProperties(origem, alvo, getNullPropertyNames(origem));

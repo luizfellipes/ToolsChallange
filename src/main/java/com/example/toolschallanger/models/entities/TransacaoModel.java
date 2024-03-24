@@ -26,18 +26,18 @@ public class TransacaoModel implements Serializable {
     }
 
     public TransacaoModel(Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
-        validacaoParcela();
         this.cartao = cartao;
         this.descricaoModel = descricaoModel;
         this.formaPagamentoModel = formaPagamentoModel;
+        validacaoParcela();
     }
 
     public TransacaoModel(UUID id, Long cartao, DescricaoModel descricaoModel, FormaPagamentoModel formaPagamentoModel) {
-        validacaoParcela();
         this.id = id;
         this.cartao = cartao;
         this.descricaoModel = descricaoModel;
         this.formaPagamentoModel = formaPagamentoModel;
+        validacaoParcela();
     }
 
     public UUID getId() {

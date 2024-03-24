@@ -4,12 +4,13 @@ import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 //@Entity
 //@Table(name = "TB_DESCRICAO")
-public class DescricaoModel {
+public class DescricaoModel implements Serializable {
 
     private Double valor;
     private LocalDateTime dataHora;
