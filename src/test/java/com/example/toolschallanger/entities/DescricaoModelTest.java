@@ -1,15 +1,26 @@
 package com.example.toolschallanger.entities;
 
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
+import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.example.toolschallanger.mocks.MocksModel.*;
 
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
 class DescricaoModelTest {
+
+    @Test
+    void deveTestarGeraNsuValido() {
+        Assertions.assertNotEquals(null, requestMockModel().getDescricaoModel().geraNsuValido());
+    }
+    @Test
+    void deveTestarGeraCodigoAutorizacaoValido() {
+        Assertions.assertNotEquals(null, requestMockModel().getDescricaoModel().geraCodigoAutorizacaoValido());
+    }
 
     @Test
     void deveTestarStatusAUTORIZADO() {
@@ -19,6 +30,23 @@ class DescricaoModelTest {
     @Test
     void deveTestarStatusNEGADO() {
         Assertions.assertEquals(Status.NEGADO, responseMockModelStatusNegado().getDescricaoModel().getStatus());
+    }
+
+    //Caso de erro
+    @Test
+    void deveDarErroAoGeraNsuValido() {
+        TransacaoModel transacaoModel = requestMockModel();
+        transacaoModel.getDescricaoModel().setValor(0D);
+
+        Assertions.assertNull(transacaoModel.getDescricaoModel().geraNsuValido());
+    }
+
+    @Test
+    void deveDarErroAoGerarCodigoAutorizacao() {
+        TransacaoModel transacaoModel = responseMockModelCodigoAutorizacaoNull();
+        transacaoModel.getDescricaoModel().setValor(0D);
+
+        Assertions.assertNull(transacaoModel.getDescricaoModel().getCodigoAutorizacao());
     }
 
     @Test
@@ -40,6 +68,5 @@ class DescricaoModelTest {
     void deveDarErroAoVerificaValorNegativo() {
         Assertions.assertDoesNotThrow(() -> responseMockModelParceladoEmissor().getDescricaoModel().verificaValorNegativo());
     }
-
 
 }

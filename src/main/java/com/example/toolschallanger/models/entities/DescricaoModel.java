@@ -88,19 +88,19 @@ public class DescricaoModel implements Serializable {
         this.estabelecimento = estabelecimento;
     }
 
-    public void geraNsuValido() {
+    public Double geraNsuValido() {
         if (this.valor <= 0.0) {
-            this.nsu = 0D;
+            return this.nsu = null;
         } else {
-            this.nsu = Math.floor(Math.random() * 1000);
+            return this.nsu = Math.floor(Math.random() * 1000);
         }
     }
 
-    public void geraCodigoAutorizacaoValido() {
-        if (this.valor <= 0.0) {
-            this.codigoAutorizacao = 0D;
+    public Double geraCodigoAutorizacaoValido() {
+        if (this.valor <= 0D) {
+            return this.codigoAutorizacao = null;
         } else {
-            this.codigoAutorizacao = Math.floor(Math.random() * 1000);
+            return this.codigoAutorizacao = Math.floor(Math.random() * 1000);
         }
     }
 

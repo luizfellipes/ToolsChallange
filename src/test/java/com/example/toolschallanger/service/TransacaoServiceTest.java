@@ -6,14 +6,15 @@ import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.services.TransacaoService;
-import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 
 import java.util.Optional;
 import java.util.UUID;
@@ -41,9 +42,7 @@ class TransacaoServiceTest {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.save(any())).thenReturn(transacaoModel);
 
-        TransacaoModel save = transacaoService.save(requestMockDTO());
-
-        Assertions.assertEquals(transacaoModel, save);
+        Assertions.assertEquals(transacaoModel, transacaoService.save(requestMockDTO()));
     }
 
     @Test
