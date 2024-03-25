@@ -88,28 +88,18 @@ public class DescricaoModel implements Serializable {
         this.estabelecimento = estabelecimento;
     }
 
-    public Double geraNsuValido() {
-        if (this.valor <= 0.0) {
-            return this.nsu = null;
-        } else {
-            return this.nsu = Math.floor(Math.random() * 1000);
+    public Double geraValoresNsuECodigoAutorizacao() {
+        if (this.valor >= 0.1) {
+            return Math.floor(Math.random() * 1000);
         }
-    }
-
-    public Double geraCodigoAutorizacaoValido() {
-        if (this.valor <= 0D) {
-            return this.codigoAutorizacao = null;
-        } else {
-            return this.codigoAutorizacao = Math.floor(Math.random() * 1000);
-        }
+        return null;
     }
 
     public Status verificaStatus() {
-        if (this.valor <= 0.0) {
-            return this.status = Status.NEGADO;
-        } else {
-            return this.status = Status.AUTORIZADO;
+        if (this.valor >= 0.1) {
+            return Status.AUTORIZADO;
         }
+        return Status.NEGADO;
     }
 
     public void verificaValorNegativo() {
@@ -121,9 +111,9 @@ public class DescricaoModel implements Serializable {
     public void geraValoresValidos() {
         if (this.nsu == null || this.codigoAutorizacao == null || this.status == null) {
             verificaValorNegativo();
-            geraNsuValido();
-            geraCodigoAutorizacaoValido();
-            verificaStatus();
+            this.nsu = geraValoresNsuECodigoAutorizacao();
+            this.codigoAutorizacao = geraValoresNsuECodigoAutorizacao();
+            this.status = verificaStatus();
         }
     }
 

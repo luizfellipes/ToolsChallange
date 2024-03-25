@@ -43,8 +43,8 @@ class TransacaoControllerTest {
     @BeforeEach
     void setUp() {
         this.transacaoService = mock(TransacaoService.class);
-        TransacaoController transacaoController = new TransacaoController(transacaoService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
+        this.mockMvc = MockMvcBuilders
+                .standaloneSetup(new TransacaoController(transacaoService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setControllerAdvice(new RequestsValidation()).build();
         this.objectMapper = new ObjectMapper()
@@ -156,7 +156,7 @@ class TransacaoControllerTest {
 
     @Test
     void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoBadRequest());
+        when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoBadRequest("requisicao nao feita"));
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +178,7 @@ class TransacaoControllerTest {
 
     @Test
     void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada());
+        when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada("transacao nao existente"));
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

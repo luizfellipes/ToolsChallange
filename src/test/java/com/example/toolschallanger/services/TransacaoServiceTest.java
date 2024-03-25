@@ -1,18 +1,21 @@
-package com.example.toolschallanger.service;
+package com.example.toolschallanger.services;
 
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
+import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
-import com.example.toolschallanger.services.TransacaoService;
 
+import com.example.toolschallanger.repositories.TransacaoRepository;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -31,6 +34,7 @@ class TransacaoServiceTest {
 
     private TransacaoService transacaoService;
 
+
     @BeforeEach
     void setUp() {
         this.transacaoService = mock(TransacaoService.class);
@@ -39,20 +43,26 @@ class TransacaoServiceTest {
     //Caso de sucesso
     @Test
     void deveTestarSave() {
-        TransacaoModel transacaoModel = responseMockModel();
+        TransacaoModel transacaoModel = requestMockModel();
         when(transacaoService.save(any())).thenReturn(transacaoModel);
+        TransacaoModel transacaoSalva = transacaoService.save(requestMockDTO());
 
-        Assertions.assertEquals(transacaoModel, transacaoService.save(requestMockDTO()));
+        verify(transacaoService, times(1)).save(any());
+
+        Assertions.assertNotNull(transacaoModel);
+        Assertions.assertNotNull(transacaoSalva);
+        Assertions.assertEquals(transacaoModel, transacaoSalva);
     }
 
     @Test
     void deveTestarEstorno() {
         TransacaoModel transacaoModel = responseMockModel();
         when(transacaoService.estorno(any())).thenReturn(transacaoModel);
+        transacaoService.estorno(transacaoModel.getId());
 
-        Status status = transacaoModel.getDescricaoModel().getStatus();
+        verify(transacaoService, times(1)).estorno(any());
 
-        Assertions.assertEquals(Status.CANCELADO, status);
+        Assertions.assertEquals(Status.CANCELADO, transacaoModel.getDescricaoModel().getStatus());
     }
 
     @Test
@@ -60,6 +70,8 @@ class TransacaoServiceTest {
         when(transacaoService.findAll(any())).thenReturn(Page.empty());
 
         boolean listaVazia = transacaoService.findAll(any()).isEmpty();
+
+        verify(transacaoService, times(1)).findAll(any());
 
         Assertions.assertTrue(listaVazia);
     }
@@ -102,11 +114,19 @@ class TransacaoServiceTest {
         Assertions.assertEquals(transacaoModel, transacaoCorrigida);
     }
 
+    @Test
+    void deveTestarConverterDtoEmEntity() {
+        when(transacaoService.converterDtoEmEntity(any())).thenReturn(responseMockModel());
+        TransacaoModel transacaoModel = transacaoService.converterDtoEmEntity(requestMockDTO());
+
+        Assertions.assertNotNull(transacaoModel);
+    }
+
 
     //Caso de falha
     @Test
     void deveDarErroAoRealizarSave() {
-        when(transacaoService.save(any(TransacaoRecordDTO.class))).thenThrow(new TransacaoBadRequest());
+        when(transacaoService.save(any())).thenThrow(new TransacaoBadRequest());
 
         Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.save(requestMockNullDTO()));
     }
@@ -152,6 +172,14 @@ class TransacaoServiceTest {
         when(transacaoService.patchById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockNullDTO()));
+    }
+
+    @Test
+    void deveDarErroAoConverterDtoEmEntity() {
+        when(transacaoService.converterDtoEmEntity(any())).thenReturn(null);
+        TransacaoModel transacaoModel = transacaoService.converterDtoEmEntity(null);
+
+        Assertions.assertNull(transacaoModel);
     }
 
 }
