@@ -41,9 +41,12 @@ public class FormaPagamentoModel implements Serializable {
     }
 
     public void validaParcela(Double valor) {
-        if (this.tipo == null || this.parcelas == null || this.parcelas <= 1 || valor < 100) {
-            if (this.tipo == FormaPagamento.PARCELADO_EMISSOR || this.tipo == FormaPagamento.PARCELADO_LOJA) {
+        if (this.tipo == null || this.parcelas == null || this.parcelas > 0) {
+            if (this.tipo == FormaPagamento.PARCELADO_EMISSOR && this.parcelas <= 1 && valor < 100|| this.tipo == FormaPagamento.PARCELADO_LOJA && this.parcelas <= 1 && valor < 100) {
                 throw new TransacaoBadRequest("Não foi possivel parcelar sua compra, somente parcelas acima de 2x e valor acima de 100 !");
+            }
+            if (this.tipo == FormaPagamento.AVISTA && this.parcelas > 1) {
+                throw new TransacaoBadRequest("Não foi possivel realizar sua compra, não é possivel parcelar no modo avista !");
             }
         }
     }
