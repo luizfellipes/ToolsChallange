@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -90,7 +90,9 @@ class TransacaoServiceTest {
         TransacaoModel mockModel = responseMockModel();
         when(transacaoRepository.findById(any())).thenReturn(Optional.of(mockModel));
 
-        Assertions.assertDoesNotThrow(() -> transacaoService.deleteById(UUID.randomUUID()));
+        Executable transacaoApagada = () -> transacaoService.deleteById(UUID.randomUUID());
+
+        Assertions.assertDoesNotThrow(transacaoApagada);
     }
 
     @Test
@@ -128,7 +130,9 @@ class TransacaoServiceTest {
     void deveDarErroAoSalvarTransacao() {
         when(transacaoRepository.save(any())).thenThrow(new TransacaoBadRequest());
 
-        Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.save(requestMockDTO()));
+        Executable save = () -> transacaoService.save(requestMockDTO());
+
+        Assertions.assertThrows(TransacaoBadRequest.class, save);
     }
 
 
@@ -136,7 +140,9 @@ class TransacaoServiceTest {
     void deveDarErroAoEstornarTransacao() {
         when(transacaoRepository.findById(any())).thenThrow(new TransacaoBadRequest());
 
-        Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.estorno(UUID.randomUUID()));
+        Executable estorno = () -> transacaoService.estorno(UUID.randomUUID());
+
+        Assertions.assertThrows(TransacaoBadRequest.class, estorno);
     }
 
 
@@ -144,35 +150,45 @@ class TransacaoServiceTest {
     void deveDarErroAoBuscarTodasAsTransacoes() {
         when(transacaoRepository.findAll(any(Pageable.class))).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findAll(Pageable.unpaged()));
+        Executable findAll = () -> transacaoService.findAll(Pageable.unpaged());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, findAll);
     }
 
     @Test
     void deveDarErroAoRealizarFindById() {
         when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findById(UUID.randomUUID()));
+        Executable findById = () -> transacaoService.findById(UUID.randomUUID());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, findById);
     }
 
     @Test
     void deveDarErroAoRealizarDelete() {
         doThrow(new TransacaoBadRequest()).when(transacaoRepository).deleteById(any(UUID.class));
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.deleteById(UUID.randomUUID()));
+        Executable delete = () -> transacaoService.deleteById(UUID.randomUUID());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, delete);
     }
 
     @Test
     void deveDarErroAoRealizarUpdate() {
         when(transacaoRepository.save(any())).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
+        Executable update = () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, update);
     }
 
     @Test
     void deveDarErroAoAplicarPatchEmTransacaoPorId() {
         when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockDTO()));
+        Executable patchById = () -> transacaoService.patchById(UUID.randomUUID(), requestMockDTO());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, patchById);
     }
 
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.example.toolschallanger.mocks.MocksModel.*;
@@ -46,7 +47,9 @@ class DescricaoModelTest {
 
     @Test
     void deveTestarVerificaValorNegativo() {
-        Assertions.assertDoesNotThrow(() -> responseMockModelParceladoEmissor().getDescricaoModel().verificaValorNegativo());
+        Executable responseMockModelParceladoEmissor = () -> responseMockModelParceladoEmissor().getDescricaoModel().verificaValorNegativo();
+
+        Assertions.assertDoesNotThrow(responseMockModelParceladoEmissor);
     }
 
     @Test
@@ -90,7 +93,9 @@ class DescricaoModelTest {
 
     @Test
     void deveDarErroAoVerificaValorNegativo() {
-        Assertions.assertThrows(TransacaoBadRequest.class, () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo());
+        Executable responseMockModelParceladoEmissorValorNegativo = () -> responseMockModelParceladoEmissorValorNegativo().getDescricaoModel().verificaValorNegativo();
+
+        Assertions.assertThrows(TransacaoBadRequest.class, responseMockModelParceladoEmissorValorNegativo);
     }
 
     @Test
