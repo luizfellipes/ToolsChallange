@@ -5,6 +5,7 @@ import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 
@@ -27,7 +28,7 @@ public class DescricaoModel implements Serializable {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
-        verificaValorNegativo();
+        this.verificaValorNegativo();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -37,7 +38,7 @@ public class DescricaoModel implements Serializable {
         this.nsu = nsu;
         this.codigoAutorizacao = codigoAutorizacao;
         this.status = status;
-        geraValoresValidos();
+        this.geraValoresValidos();
     }
 
     public Double getValor() {
@@ -89,17 +90,12 @@ public class DescricaoModel implements Serializable {
     }
 
     public Double geraValoresNsuECodigoAutorizacao() {
-        if (this.valor >= 0.1) {
-            return Math.floor(Math.random() * 1000);
-        }
-        return null;
+        SecureRandom random = new SecureRandom();
+        return this.valor >= 0.1 ? Math.floor(random.nextDouble() * 1000.0) : null;
     }
 
     public Status verificaStatus() {
-        if (this.valor >= 0.1) {
-            return Status.AUTORIZADO;
-        }
-        return Status.NEGADO;
+        return this.valor >= 0.1 ? Status.AUTORIZADO : Status.NEGADO;
     }
 
     public void verificaValorNegativo() {
@@ -110,7 +106,7 @@ public class DescricaoModel implements Serializable {
 
     public void geraValoresValidos() {
         if (this.nsu == null || this.codigoAutorizacao == null || this.status == null) {
-            verificaValorNegativo();
+            this.verificaValorNegativo();
             this.nsu = geraValoresNsuECodigoAutorizacao();
             this.codigoAutorizacao = geraValoresNsuECodigoAutorizacao();
             this.status = verificaStatus();

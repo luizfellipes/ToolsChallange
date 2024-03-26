@@ -2,28 +2,30 @@ package com.example.toolschallanger.services;
 
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
-import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
-import com.example.toolschallanger.models.entities.DescricaoModel;
+
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 
 import com.example.toolschallanger.repositories.TransacaoRepository;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.toolschallanger.mocks.MocksDTO.*;
 import static com.example.toolschallanger.mocks.MocksDTO.requestMockDTO;
+
 import static com.example.toolschallanger.mocks.MocksModel.requestMockModel;
 import static com.example.toolschallanger.mocks.MocksModel.responseMockModel;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,90 +35,88 @@ import static org.mockito.Mockito.*;
 class TransacaoServiceTest {
 
     private TransacaoService transacaoService;
+    private TransacaoRepository transacaoRepository;
 
 
     @BeforeEach
     void setUp() {
-        this.transacaoService = mock(TransacaoService.class);
+        this.transacaoRepository = mock(TransacaoRepository.class);
+        this.transacaoService = new TransacaoService(transacaoRepository);
     }
 
     //Caso de sucesso
     @Test
-    void deveTestarSave() {
-        TransacaoModel transacaoModel = requestMockModel();
-        when(transacaoService.save(any())).thenReturn(transacaoModel);
-        TransacaoModel transacaoSalva = transacaoService.save(requestMockDTO());
+    void deveTestarSaveComSucesso() {
+        TransacaoModel mockModel = responseMockModel();
+        when(transacaoRepository.save(any())).thenReturn(mockModel);
 
-        verify(transacaoService, times(1)).save(any());
+        TransacaoModel savedTransacao = transacaoService.save(requestMockDTO());
 
-        Assertions.assertNotNull(transacaoModel);
-        Assertions.assertNotNull(transacaoSalva);
-        Assertions.assertEquals(transacaoModel, transacaoSalva);
+        Assertions.assertEquals(mockModel, savedTransacao);
     }
 
     @Test
     void deveTestarEstorno() {
-        TransacaoModel transacaoModel = responseMockModel();
-        when(transacaoService.estorno(any())).thenReturn(transacaoModel);
-        transacaoService.estorno(transacaoModel.getId());
-
-        verify(transacaoService, times(1)).estorno(any());
+        TransacaoModel transacaoModel = requestMockModel();
+        when(transacaoRepository.save(transacaoModel)).thenReturn(transacaoModel);
+        when(transacaoRepository.findById(transacaoModel.getId())).thenReturn(Optional.of(transacaoModel));
+        when(transacaoService.estorno(transacaoModel.getId())).thenReturn(transacaoModel);
 
         Assertions.assertEquals(Status.CANCELADO, transacaoModel.getDescricaoModel().getStatus());
     }
 
     @Test
-    void deveTestarFindAll() {
-        when(transacaoService.findAll(any())).thenReturn(Page.empty());
+    void deveTestarFindAllComSucesso() {
+        Page<TransacaoModel> mockPage = new PageImpl<>(Collections.singletonList(responseMockModel()));
+        when(transacaoRepository.findAll(any(Pageable.class))).thenReturn(mockPage);
 
-        boolean listaVazia = transacaoService.findAll(any()).isEmpty();
+        Page<TransacaoModel> transacoes = transacaoService.findAll(Pageable.unpaged());
 
-        verify(transacaoService, times(1)).findAll(any());
-
-        Assertions.assertTrue(listaVazia);
+        Assertions.assertFalse(transacoes.isEmpty());
     }
 
     @Test
-    void deveTestarFindById() {
-        TransacaoModel transacaoModel = requestMockModel();
-        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
-        Optional<TransacaoModel> transacao = transacaoService.findById(requestMockModel().getId());
+    void deveTestarFindByIdComSucesso() {
+        TransacaoModel mockModel = responseMockModel();
+        when(transacaoRepository.findById(any())).thenReturn(Optional.of(mockModel));
 
-        Assertions.assertEquals(transacaoModel.getId(), transacao.get().getId());
+        Optional<TransacaoModel> transacao = transacaoService.findById(UUID.randomUUID());
+
+        Assertions.assertTrue(transacao.isPresent());
     }
 
     @Test
-    void deveTestarDelete() {
-        TransacaoModel transacaoModel = requestMockModel();
-        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
+    void deveTestarDeleteByIdComSucesso() {
+        TransacaoModel mockModel = responseMockModel();
+        when(transacaoRepository.findById(any())).thenReturn(Optional.of(mockModel));
 
-        transacaoService.deleteById(transacaoModel.getId());
-        verify(transacaoService, times(1)).deleteById(transacaoModel.getId());
+        Assertions.assertDoesNotThrow(() -> transacaoService.deleteById(UUID.randomUUID()));
     }
 
     @Test
-    void deveTestarUpdate() {
-        TransacaoModel transacaoModel = responseMockModel();
-        when(transacaoService.updateById(any(), any())).thenReturn(transacaoModel);
+    void deveTestarUpdateByIdComSucesso() {
+        TransacaoModel mockModel = responseMockModel();
+        when(transacaoRepository.findById(any())).thenReturn(Optional.of(mockModel));
+        when(transacaoRepository.save(any())).thenReturn(mockModel);
 
-        TransacaoModel transacaoAtualizada = transacaoService.updateById(responseMockModel().getId(), responseMockDTO());
+        TransacaoModel updatedTransacao = transacaoService.updateById(UUID.randomUUID(), requestMockDTO());
 
-        Assertions.assertEquals(transacaoModel, transacaoAtualizada);
+        Assertions.assertEquals(mockModel, updatedTransacao);
     }
 
     @Test
-    void deveTestarPatch() {
-        TransacaoModel transacaoModel = responseMockModel();
-        when(transacaoService.patchById(any(), any())).thenReturn(transacaoModel);
+    void deveTestarPatchByIdComSucesso() {
+        TransacaoModel mockModel = responseMockModel();
+        when(transacaoRepository.findById(any())).thenReturn(Optional.of(mockModel));
+        when(transacaoRepository.save(any())).thenReturn(mockModel);
 
-        TransacaoModel transacaoCorrigida = transacaoService.patchById(responseMockModel().getId(), responseMockDTO());
+        TransacaoModel patchedTransacao = transacaoService.patchById(UUID.randomUUID(), requestMockDTO());
 
-        Assertions.assertEquals(transacaoModel, transacaoCorrigida);
+        Assertions.assertEquals(mockModel, patchedTransacao);
     }
 
     @Test
     void deveTestarConverterDtoEmEntity() {
-        when(transacaoService.converterDtoEmEntity(any())).thenReturn(responseMockModel());
         TransacaoModel transacaoModel = transacaoService.converterDtoEmEntity(requestMockDTO());
 
         Assertions.assertNotNull(transacaoModel);
@@ -125,61 +125,54 @@ class TransacaoServiceTest {
 
     //Caso de falha
     @Test
-    void deveDarErroAoRealizarSave() {
-        when(transacaoService.save(any())).thenThrow(new TransacaoBadRequest());
+    void deveDarErroAoSalvarTransacao() {
+        when(transacaoRepository.save(any())).thenThrow(new TransacaoBadRequest());
 
-        Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.save(requestMockNullDTO()));
+        Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.save(requestMockDTO()));
     }
 
+
     @Test
-    void deveDarErroAoRealizarEstorno() {
-        when(transacaoService.estorno(any())).thenThrow(new TransacaoBadRequest());
+    void deveDarErroAoEstornarTransacao() {
+        when(transacaoRepository.findById(any())).thenThrow(new TransacaoBadRequest());
 
         Assertions.assertThrows(TransacaoBadRequest.class, () -> transacaoService.estorno(UUID.randomUUID()));
     }
 
-    @Test
-    void deveDarErroAoRealizarFindAll() {
-        when(transacaoService.findAll(any())).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findAll(any()));
+    @Test
+    void deveDarErroAoBuscarTodasAsTransacoes() {
+        when(transacaoRepository.findAll(any(Pageable.class))).thenThrow(new TransacaoNaoEncontrada());
+
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findAll(Pageable.unpaged()));
     }
 
     @Test
     void deveDarErroAoRealizarFindById() {
-        when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada());
+        when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.findById(UUID.randomUUID()));
     }
 
     @Test
     void deveDarErroAoRealizarDelete() {
-        TransacaoModel transacaoModel = new TransacaoModel();
-        doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(transacaoModel.getId());
+        doThrow(new TransacaoBadRequest()).when(transacaoRepository).deleteById(any(UUID.class));
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.deleteById(transacaoModel.getId()));
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.deleteById(UUID.randomUUID()));
     }
 
     @Test
     void deveDarErroAoRealizarUpdate() {
-        when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
+        when(transacaoRepository.save(any())).thenThrow(new TransacaoNaoEncontrada());
 
         Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO()));
     }
 
     @Test
-    void deveDarErroAoRealizarUmPatch() {
-        when(transacaoService.patchById(any(), any())).thenThrow(new TransacaoNaoEncontrada());
+    void deveDarErroAoAplicarPatchEmTransacaoPorId() {
+        when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockNullDTO()));
-    }
-
-    @Test
-    void deveDarErroAoConverterDtoEmEntity() {
-        when(transacaoService.converterDtoEmEntity(any())).thenReturn(null);
-        TransacaoModel transacaoModel = transacaoService.converterDtoEmEntity(null);
-
-        Assertions.assertNull(transacaoModel);
+        Assertions.assertThrows(TransacaoNaoEncontrada.class, () -> transacaoService.patchById(UUID.randomUUID(), requestMockDTO()));
     }
 
 }
