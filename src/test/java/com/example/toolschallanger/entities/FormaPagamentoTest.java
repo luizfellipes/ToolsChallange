@@ -11,45 +11,39 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 import static com.example.toolschallanger.mocks.MocksModel.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
 class FormaPagamentoTest {
-
 
     private FormaPagamentoModel formaPagamentoModel;
 
     @BeforeEach
     void setUp() {
-        this.formaPagamentoModel = mock(FormaPagamentoModel.class);
+        this.formaPagamentoModel = new FormaPagamentoModel();
     }
 
     @Test
     void deveValidaParcelaSucesso() {
-        formaPagamentoModel.validaParcela(500D);
-
-        verify(formaPagamentoModel, times(1)).validaParcela(500D);
-
         Executable responseMockModelParceladoEmissor = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoEmissor().getDescricaoModel().getValor());
-        Executable responseMockModelParceladoLojaValorZero = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoLojaValorZero().getDescricaoModel().getValor());
-        Executable requestMockModel1 = () -> formaPagamentoModel.validaParcela(requestMockModel1().getDescricaoModel().getValor());
-
         Assertions.assertDoesNotThrow(responseMockModelParceladoEmissor);
+
+        Executable responseMockModelParceladoLojaValorZero = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoLojaValorZero().getDescricaoModel().getValor());
         Assertions.assertDoesNotThrow(responseMockModelParceladoLojaValorZero);
+
+        Executable requestMockModel1 = () -> formaPagamentoModel.validaParcela(requestMockModelAvista().getDescricaoModel().getValor());
         Assertions.assertDoesNotThrow(requestMockModel1);
     }
 
     @Test
     void deveDarErroAoValidarParcela() {
-        formaPagamentoModel.validaParcela(500D);
-
-        verify(formaPagamentoModel, times(1)).validaParcela(500D);
         Executable responseMockModelParceladoValorBaixo = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor());
-        Executable responseMockModelParceladoLojaParcela1 = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoLojaParcela1().getDescricaoModel().getValor());
-        Executable responseMockModelAvistaParcela2 = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor());
-
         Assertions.assertThrows(TransacaoBadRequest.class, responseMockModelParceladoValorBaixo);
+
+        Executable responseMockModelParceladoLojaParcela1 = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoLojaParcela1().getDescricaoModel().getValor());
         Assertions.assertThrows(TransacaoBadRequest.class, responseMockModelParceladoLojaParcela1);
+
+        Executable responseMockModelAvistaParcela2 = () -> formaPagamentoModel.validaParcela(responseMockModelParceladoValorBaixo().getDescricaoModel().getValor());
         Assertions.assertThrows(TransacaoBadRequest.class, responseMockModelAvistaParcela2);
     }
 

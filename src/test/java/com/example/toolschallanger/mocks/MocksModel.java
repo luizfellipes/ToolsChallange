@@ -18,7 +18,7 @@ public abstract class MocksModel {
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop", 0000.1111, 0000.1111, Status.AUTORIZADO),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));
     }
-    public static TransacaoModel requestMockModel1() {
+    public static TransacaoModel requestMockModelAvista() {
         return new TransacaoModel(UUID.fromString("8e15652a-47e3-4d3d-bdb3-6b58ec871d74"), 1065151L,
                 new DescricaoModel(50.00, LocalDateTime.parse("2021-01-01T18:30:00"), "PetShop"),
                 new FormaPagamentoModel(FormaPagamento.AVISTA, 1));

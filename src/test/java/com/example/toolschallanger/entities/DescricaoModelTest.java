@@ -68,7 +68,7 @@ class DescricaoModelTest {
     //Caso de erro
     @Test
     void deveDarErroAoGeraNsuValido() {
-        TransacaoModel transacaoModel = requestMockModel1();
+        TransacaoModel transacaoModel = requestMockModelAvista();
         transacaoModel.getDescricaoModel().setValor(0D);
 
         Assertions.assertNull(transacaoModel.getDescricaoModel().geraValoresNsuECodigoAutorizacao());

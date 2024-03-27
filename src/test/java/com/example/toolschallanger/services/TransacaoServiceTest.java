@@ -3,6 +3,7 @@ package com.example.toolschallanger.services;
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 
+import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 
@@ -50,10 +51,16 @@ class TransacaoServiceTest {
         TransacaoModel mockModel = responseMockModel();
         when(transacaoRepository.save(any())).thenReturn(mockModel);
 
-        TransacaoModel savedTransacao = transacaoService.save(requestMockDTO());
+        TransacaoModel savedTransacao = transacaoService.save(responseMockDTO());
 
-        Assertions.assertEquals(mockModel, savedTransacao);
+        Assertions.assertEquals(mockModel.getDescricaoModel().getValor(), savedTransacao.getDescricaoModel().getValor());
+        Assertions.assertEquals(mockModel.getDescricaoModel().getDataHora(), savedTransacao.getDescricaoModel().getDataHora());
+        Assertions.assertEquals(mockModel.getDescricaoModel().getEstabelecimento(), savedTransacao.getDescricaoModel().getEstabelecimento());
+        Assertions.assertEquals(mockModel.getFormaPagamentoModel().getTipo(), savedTransacao.getFormaPagamentoModel().getTipo());
+        Assertions.assertEquals(mockModel.getFormaPagamentoModel().getParcelas(), savedTransacao.getFormaPagamentoModel().getParcelas());
     }
+
+
 
     @Test
     void deveTestarEstorno() {
@@ -184,10 +191,14 @@ class TransacaoServiceTest {
 
     @Test
     void deveDarErroAoAplicarPatchEmTransacaoPorId() {
+        TransacaoRecordDTO transacaoRecordDTO = requestMockNullDTO();
+
+        when(transacaoRepository.findById(any())).thenReturn(Optional.of(new TransacaoModel()));
+        TransacaoModel patchedTransacao = transacaoService.patchById(UUID.randomUUID(), transacaoRecordDTO);
+        Assertions.assertNull(patchedTransacao.getCartao());
+
         when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
-
-        Executable patchById = () -> transacaoService.patchById(UUID.randomUUID(), requestMockDTO());
-
+        Executable patchById = () -> transacaoService.patchById(UUID.randomUUID(), transacaoRecordDTO);
         Assertions.assertThrows(TransacaoNaoEncontrada.class, patchById);
     }
 

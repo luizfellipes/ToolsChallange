@@ -32,9 +32,12 @@ public class TransacaoService {
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
         return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
-                .peek(transacaoModel -> transacaoModel.getDescricaoModel().geraValoresValidos())
-                .map(transacaoRepository::save)
-                .peek(l -> log.info("Saved transaction with successfully."))
+                .map(transacaoModel -> {
+                    transacaoModel.getDescricaoModel().geraValoresValidos();
+                    transacaoRepository.save(transacaoModel);
+                    log.info("Saved transaction with successfully.");
+                    return transacaoModel;
+                })
                 .findFirst()
                 .orElseThrow(TransacaoBadRequest::new);
     }
@@ -42,9 +45,12 @@ public class TransacaoService {
     public TransacaoModel estorno(UUID id) {
         return Stream.of(findById(id).get())
                 .filter(transacaoModel -> Objects.equals(transacaoModel.getDescricaoModel().getStatus(), Status.AUTORIZADO))
-                .peek(transacaoModel -> transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO))
-                .map(transacaoRepository::save)
-                .peek(l -> log.info("Transaction reversed on the following ID: {}", id))
+                .map(transacaoModel -> {
+                    transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO);
+                    transacaoRepository.save(transacaoModel);
+                    log.info("Transaction reversed on the following ID: {}", id);
+                    return transacaoModel;
+                })
                 .findFirst()
                 .orElseThrow(TransacaoBadRequest::new);
     }
@@ -72,26 +78,30 @@ public class TransacaoService {
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoExistente = findById(id).get();
-        return Stream.of(transacaoRecordDTO)
-                .map(this::converterDtoEmEntity)
-                .peek(transacao -> copyProperties(transacao.getCartao(), transacaoExistente.getCartao()))
-                .peek(transacao -> copyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel()))
-                .peek(transacao -> copyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel()))
-                .map(transacao -> transacaoRepository.save(transacaoExistente))
-                .peek(l -> log.info("Updated transaction with successfully."))
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
+                .map(transacao -> {
+                    copyProperties(transacao.getCartao(), transacaoExistente.getCartao());
+                    copyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel());
+                    copyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel());
+                    transacaoRepository.save(transacaoExistente);
+                    log.info("Updated transaction with successfully.");
+                    return transacaoExistente;
+                })
                 .findFirst()
                 .orElseThrow();
     }
 
     public TransacaoModel patchById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
         TransacaoModel transacaoPatching = findById(id).get();
-        return Stream.of(transacaoRecordDTO)
-                .map(this::converterDtoEmEntity)
-                .peek(transacao -> transacaoPatching.setCartao(transacao.getCartao() != null ? transacao.getCartao() : transacaoPatching.getCartao()))
-                .peek(transacao -> copyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel()))
-                .peek(transacao -> copyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel()))
-                .map(transacao -> transacaoRepository.save(transacaoPatching))
-                .peek(l -> log.info("Patching transaction with successfully."))
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
+                .map(transacao -> {
+                    transacaoPatching.setCartao(transacao.getCartao() != null ? transacao.getCartao() : transacaoPatching.getCartao());
+                    copyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel());
+                    copyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel());
+                    transacaoRepository.save(transacaoPatching);
+                    log.info("Patching transaction with successfully.");
+                    return transacaoPatching;
+                })
                 .findFirst()
                 .orElseThrow();
     }
