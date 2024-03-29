@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfiguration {
 
     @Bean
-    public OpenAPI TransacaoOpenAPI() {
+    public OpenAPI transacaoOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("Transação API-Rest")
                         .description("Uma api de transação para estudos em spring e java")

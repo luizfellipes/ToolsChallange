@@ -1,5 +1,7 @@
 package com.example.toolschallanger.services;
 
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
 import com.example.toolschallanger.models.entities.DescricaoModel;
 import com.example.toolschallanger.models.entities.FormaPagamentoModel;
@@ -7,63 +9,110 @@ import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.models.enuns.Status;
 import com.example.toolschallanger.repositories.TransacaoRepository;
 
-import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
+import static com.example.toolschallanger.config.CopyPropertiesConfig.copyProperties;
 
 @Service
 public class TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
+    private static final Logger log = LoggerFactory.getLogger(TransacaoService.class);
 
     public TransacaoService(TransacaoRepository transacaoRepository) {
         this.transacaoRepository = transacaoRepository;
     }
 
     public TransacaoModel save(TransacaoRecordDTO transacaoRecordDTO) {
-        TransacaoModel transacaoModel = converterDtoEmEntity(transacaoRecordDTO);
-        return transacaoRepository.save(transacaoModel);
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
+                .map(transacaoModel -> {
+                    transacaoModel.getDescricaoModel().geraValoresValidos();
+                    transacaoRepository.save(transacaoModel);
+                    log.info("Saved transaction with successfully.");
+                    return transacaoModel;
+                })
+                .findFirst()
+                .orElseThrow(TransacaoBadRequest::new);
     }
 
     public TransacaoModel estorno(UUID id) {
-        TransacaoModel transacaoParaEstornar = findById(id).get();
-        if (transacaoParaEstornar.getDescricaoModel().getStatus() != Status.CANCELADO) {
-            transacaoParaEstornar.getDescricaoModel().setStatus(Status.CANCELADO);
-            return transacaoRepository.save(transacaoParaEstornar);
-        } else {
-            throw new IllegalArgumentException("Não foi possivel realizar um estorno: A transação é diferente de AUTORIZADO !");
-        }
+        return Stream.of(findById(id).get())
+                .filter(transacaoModel -> Objects.equals(transacaoModel.getDescricaoModel().getStatus(), Status.AUTORIZADO))
+                .map(transacaoModel -> {
+                    transacaoModel.getDescricaoModel().setStatus(Status.CANCELADO);
+                    transacaoRepository.save(transacaoModel);
+                    log.info("Transaction reversed on the following ID: {}", id);
+                    return transacaoModel;
+                })
+                .findFirst()
+                .orElseThrow(TransacaoBadRequest::new);
     }
 
-    public List<TransacaoModel> findAll() {
-        return Optional.of(transacaoRepository.findAll())
-                .filter(lista -> !lista.isEmpty())
-                .orElseThrow(() -> new EntityNotFoundException("Sem transações registradas !"));
+    public Page<TransacaoModel> findAll(Pageable pageable) {
+        return Optional.of(transacaoRepository.findAll(pageable))
+                .stream()
+                .peek(l -> log.info("A search was carried out on the base."))
+                .findFirst()
+                .orElseThrow(() -> new TransacaoNaoEncontrada("Não há dados na base."));
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.ofNullable(transacaoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID não existente !")));
+                .stream()
+                .peek(l -> log.info("The following id was searched: {}", id))
+                .findFirst()
+                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));
     }
 
-    public Object deleteById(UUID id) {
-        findById(id).ifPresent(transacao -> transacaoRepository.deleteById(id));
-        return Collections.singletonMap("Foi deletado o seguinte ID", id);
+    public void deleteById(UUID id) {
+        findById(id).ifPresent(transacaoModel -> transacaoRepository.deleteById(id));
+        log.info("Transaction deleted successfully.");
     }
 
     public TransacaoModel updateById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
-        Optional<TransacaoModel> transacaoExistente = findById(id).map(transacaoModel -> converterDtoEmEntity(transacaoRecordDTO));
-        transacaoExistente.get().setId(id);
-        return transacaoRepository.save(transacaoExistente.get());
+        TransacaoModel transacaoExistente = findById(id).get();
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
+                .map(transacao -> {
+                    copyProperties(transacao.getCartao(), transacaoExistente.getCartao());
+                    copyProperties(transacao.getDescricaoModel(), transacaoExistente.getDescricaoModel());
+                    copyProperties(transacao.getFormaPagamentoModel(), transacaoExistente.getFormaPagamentoModel());
+                    transacaoRepository.save(transacaoExistente);
+                    log.info("Updated transaction with successfully.");
+                    return transacaoExistente;
+                })
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public TransacaoModel patchById(UUID id, TransacaoRecordDTO transacaoRecordDTO) {
+        TransacaoModel transacaoPatching = findById(id).get();
+        return Stream.of(converterDtoEmEntity(transacaoRecordDTO))
+                .map(transacao -> {
+                    transacaoPatching.setCartao(transacao.getCartao() != null ? transacao.getCartao() : transacaoPatching.getCartao());
+                    copyProperties(transacao.getDescricaoModel(), transacaoPatching.getDescricaoModel());
+                    copyProperties(transacao.getFormaPagamentoModel(), transacaoPatching.getFormaPagamentoModel());
+                    transacaoRepository.save(transacaoPatching);
+                    log.info("Patching transaction with successfully.");
+                    return transacaoPatching;
+                })
+                .findFirst()
+                .orElseThrow();
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        return new TransacaoModel(transacaoRecordDTO.cartao(),
-                new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()),
-                new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()));
+        return new TransacaoModel(
+                transacaoRecordDTO.cartao(),
+                transacaoRecordDTO.descricaoDePagamento() != null ?
+                        new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()) : null,
+                transacaoRecordDTO.formaDePagamento() != null ?
+                        new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()) : null);
     }
-
 
 }

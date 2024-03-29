@@ -1,22 +1,25 @@
 package com.example.toolschallanger.controller;
 
 
-import com.example.toolschallanger.exceptions.validacoes.Validacoes;
+import com.example.toolschallanger.exceptions.RequestsValidation;
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
+import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
+import com.example.toolschallanger.models.entities.TransacaoModel;
 import com.example.toolschallanger.services.TransacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,18 +34,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(SpringExtension.class)
-public class TransacaoControllerTest {
+class TransacaoControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private TransacaoService transacaoService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.transacaoService = mock(TransacaoService.class);
-        TransacaoController transacaoController = new TransacaoController(transacaoService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController)
-                .setControllerAdvice(new Validacoes()).build();
+        this.mockMvc = MockMvcBuilders
+                .standaloneSetup(new TransacaoController(transacaoService))
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .setControllerAdvice(new RequestsValidation()).build();
         this.objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModule(new JavaTimeModule());
@@ -50,7 +54,7 @@ public class TransacaoControllerTest {
 
     //deve testar caso de sucesso
     @Test
-    public void deveCriarUmaNovaTransacao() throws Exception {
+    void deveCriarUmaNovaTransacao() throws Exception {
         when(transacaoService.save(any())).thenReturn(requestMockModel());
 
         mockMvc.perform(post("/transacoes")
@@ -64,20 +68,20 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveRealizarUmEstorno() throws Exception {
+    void deveRealizarUmEstorno() throws Exception {
         when(transacaoService.estorno(any())).thenReturn(responseMockModel());
 
-        mockMvc.perform(post("/transacoes/estorno/" + UUID.randomUUID())
+        mockMvc.perform(post("/transacoes/estorno/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(responseMockModel())))
+                        .content(objectMapper.writeValueAsString(requestMockModel())))
                 .andDo(print())
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricaoModel.status").value("CANCELADO"))
                 .andReturn();
     }
 
     @Test
-    public void deveRealizarUmUpdate() throws Exception {
+    void deveRealizarUmUpdate() throws Exception {
         when(transacaoService.updateById(any(), any())).thenReturn(responseMockModel());
 
         mockMvc.perform(put("/transacoes/" + requestMockModel().getId())
@@ -85,22 +89,37 @@ public class TransacaoControllerTest {
                         .content(objectMapper.writeValueAsString(responseMockDTO())))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricaoModel.estabelecimento").value(responseMockDTO().descricaoDePagamento().estabelecimento()))
                 .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoGetAll() throws Exception {
-        when(transacaoService.findAll()).thenReturn(List.of(requestMockModel()));
+    void deveRealizarUmPatch() throws Exception {
+        when(transacaoService.patchById(any(), any())).thenReturn(responseMockModel());
 
-        mockMvc.perform(get("/transacoes/"))
+        mockMvc.perform(patch("/transacoes/" + requestMockModel().getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(responseMockDTO())))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricaoModel.estabelecimento").value(responseMockDTO().descricaoDePagamento().estabelecimento()))
+                .andReturn();
+    }
+
+    @Test
+    void deveTestarTransacaoGetAll() throws Exception {
+        when(transacaoService.findAll(any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/transacoes?size=5?page=0"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoGetOne() throws Exception {
-        when(transacaoService.findById(any())).thenReturn(Optional.of(requestMockModel()));
+    void deveTestarTransacaoGetOne() throws Exception {
+        TransacaoModel transacaoModel = requestMockModel();
+        when(transacaoService.findById(any())).thenReturn(Optional.of(transacaoModel));
 
         mockMvc.perform(get("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,21 +130,21 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveTestarTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenReturn(null);
+    void deveTestarTransacaoDelete() throws Exception {
+        when(transacaoService.findById(any())).thenReturn(null);
 
         mockMvc.perform(delete("/transacoes/" + requestMockModel().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responseMockDTO())))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn();
     }
 
     //deve testar caso de falha
     @Test
-    public void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
-        when(transacaoService.save(any())).thenReturn(requestNullMockModel());
+    void deveDarErroNaCriacaoDeUmaNovaTransacao() throws Exception {
+        when(transacaoService.save(any())).thenThrow(new TransacaoBadRequest());
 
         mockMvc.perform(post("/transacoes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -136,8 +155,8 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
-        when(transacaoService.updateById(any(), any())).thenThrow(new RuntimeException());
+    void deveDarErroAoRealizarUmaTransacaoUpdate() throws Exception {
+        when(transacaoService.updateById(any(), any())).thenThrow(new TransacaoBadRequest("requisicao nao feita"));
 
         mockMvc.perform(put("/transacoes/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -148,18 +167,18 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
-        when(transacaoService.findAll().isEmpty()).thenThrow(new EntityNotFoundException());
+    void deveDarErroAoSolicitarTransacaoVaziasNoGetAll() throws Exception {
+        doThrow(TransacaoNaoEncontrada.class).when(transacaoService).findAll(any());
 
-        mockMvc.perform(get("/transacoes/"))
+        mockMvc.perform(get("/transacoes"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andReturn();
     }
 
     @Test
-    public void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
-        when(transacaoService.findById(any())).thenThrow(new EntityNotFoundException());
+    void deveTestarTransacaoGetOne_CasoDeFalha() throws Exception {
+        when(transacaoService.findById(any())).thenThrow(new TransacaoNaoEncontrada("transacao nao existente"));
 
         mockMvc.perform(get("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())
@@ -168,8 +187,8 @@ public class TransacaoControllerTest {
     }
 
     @Test
-    public void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
-        when(transacaoService.deleteById(any())).thenThrow(new EntityNotFoundException());
+    void deveDarErroAoRealizarUmaTransacaoDelete() throws Exception {
+        doThrow(TransacaoNaoEncontrada.class).when(transacaoService).deleteById(any());
 
         mockMvc.perform(delete("/transacoes/" + UUID.randomUUID()))
                 .andDo(print())

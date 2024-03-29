@@ -1,14 +1,17 @@
 package com.example.toolschallanger.models.entities;
 
+import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.models.enuns.Status;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 
 //@Entity
 //@Table(name = "TB_DESCRICAO")
-public class DescricaoModel {
+public class DescricaoModel implements Serializable {
 
     private Double valor;
     private LocalDateTime dataHora;
@@ -25,7 +28,7 @@ public class DescricaoModel {
         this.valor = valor;
         this.dataHora = dataHora;
         this.estabelecimento = estabelecimento;
-        geraValoresValidos();
+        this.verificaValorNegativo();
     }
 
     public DescricaoModel(Double valor, LocalDateTime dataHora, String estabelecimento, Double nsu, Double codigoAutorizacao, Status status) {
@@ -35,7 +38,7 @@ public class DescricaoModel {
         this.nsu = nsu;
         this.codigoAutorizacao = codigoAutorizacao;
         this.status = status;
-        geraValoresValidos();
+        this.geraValoresValidos();
     }
 
     public Double getValor() {
@@ -74,46 +77,39 @@ public class DescricaoModel {
         this.codigoAutorizacao = codigoAutorizacao;
     }
 
-    public void geraNsuValido() {
-        if (this.valor <= 0.0) {
-            this.nsu = 0D;
-        } else {
-            this.nsu = Math.floor(Math.random() * 1000);
-        }
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 
-    public void geraCodigoAutorizacaoValido() {
-        if (this.valor <= 0.0) {
-            this.codigoAutorizacao = 0D;
-        } else {
-            this.codigoAutorizacao = Math.floor(Math.random() * 1000);
-        }
+    public void setDataHora(LocalDateTime dataHora) {
+        this.dataHora = dataHora;
+    }
+
+    public void setEstabelecimento(String estabelecimento) {
+        this.estabelecimento = estabelecimento;
+    }
+
+    public Double geraValoresNsuECodigoAutorizacao() {
+        SecureRandom random = new SecureRandom();
+        return this.valor >= 0.1 ? Math.floor(random.nextDouble() * 1000.0) : null;
     }
 
     public Status verificaStatus() {
-        if (this.valor <= 0.0) {
-            return this.status = Status.NEGADO;
-        } else {
-            return this.status = Status.AUTORIZADO;
-        }
+        return this.valor >= 0.1 ? Status.AUTORIZADO : Status.NEGADO;
     }
 
     public void verificaValorNegativo() {
-        if (this.valor < 0.0) {
-            throw new IllegalArgumentException("Valores negativos não são permitidos !");
+        if (this.valor != null && this.valor < 0.0) {
+            throw new TransacaoBadRequest("Valores negativos não são permitidos !");
         }
     }
 
     public void geraValoresValidos() {
-        if (this.nsu == null && this.codigoAutorizacao == null && this.status == null) {
-            verificaValorNegativo();
-            geraNsuValido();
-            geraCodigoAutorizacaoValido();
-            verificaStatus();
-        } else {
-            this.nsu = getNsu();
-            this.codigoAutorizacao = getCodigoAutorizacao();
-            this.status = getStatus();
+        if (this.nsu == null || this.codigoAutorizacao == null || this.status == null) {
+            this.verificaValorNegativo();
+            this.nsu = geraValoresNsuECodigoAutorizacao();
+            this.codigoAutorizacao = geraValoresNsuECodigoAutorizacao();
+            this.status = verificaStatus();
         }
     }
 
