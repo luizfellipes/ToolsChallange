@@ -1,11 +1,13 @@
 package com.example.toolschallanger.exceptions.validacoes;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.stream.Stream;
 public class Validacoes {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, NullPointerException.class})
-    public ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
+    private ResponseEntity<Object> validaCamposNulosOuVazio(Exception exception) {
         Map<String, Object> camposVazios = new HashMap<>();
         if (exception instanceof MethodArgumentNotValidException validacaoEx) {
             validacaoEx.getBindingResult().getFieldErrors().forEach(erro -> camposVazios.put(erro.getField(), erro.getDefaultMessage()));
@@ -28,17 +30,19 @@ public class Validacoes {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(camposVazios);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> runtimeException(RuntimeException exception) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    private ResponseEntity<Object> EntityNotFoundException(EntityNotFoundException exception) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("Oops, solicitação não encontrada", exception.getMessage());
+        errorResponse.put("StatusCode", HttpStatus.NOT_FOUND.value());
+        errorResponse.put("Detalhes", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> runtimeException(IllegalArgumentException exception) {
+    private ResponseEntity<Object> IllegalArgumentException(IllegalArgumentException exception) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("Solicitação invalida", exception.getMessage());
+        errorResponse.put("StatusCode", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("Detalhes", exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
