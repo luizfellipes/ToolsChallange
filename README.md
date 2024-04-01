@@ -3,39 +3,37 @@
 <h3><p>Projeto que serve de referência para o desenvolvimento de software em Java.</p></h3>
 
 É um projeto proposto para ser clonado e reutilizado, para ilustrar o projeto inclui:<br>
-(a) Transação de cartão formada por orientação objeto com uma entidade principal e duas dependentes;<br>
+(a) Transação de cartão formada por orientação objeto com uma entidade principal e duas dependentes, tratamento de erros  e teste unitarios;<br>
 (b) REST API para realizar pagamentos mediantes a cartões sendo avista ou parcelado.<br>
 (c) modelo de post e response:
 
 Post:
-
 ~~~
 {
-    "cartao": 1424214,
+    "cartao": 5165165156,
     "descricaoDePagamento":{
         "valor": 100,
         "dataHora": "2021-01-25T18:30:00",
         "estabelecimento": "PetShop Mundo Cão"
     },
     "formaDePagamento":{
-        "tipo": "AVISTA",
+       "tipo": "AVISTA",
         "parcelas": 1
     }
 }
 ~~~ 
 
 Response:
-
 ~~~
 {
-	"id": "7d968765-8d6d-4740-9912-2ee08304954c",
-	"cartao": 1424214,
+	"id": "56e90714-1d82-4bfa-9bdd-559c853a39d6",
+	"cartao": 5165165156,
 	"descricaoModel": {
 		"valor": 100.0,
 		"dataHora": "2021-01-25T18:30:00",
 		"estabelecimento": "PetShop Mundo Cão",
-		"nsu": 0.3862791307688558,
-		"codigoAutorizacao": 0.8936644582119375,
+		"nsu": 104.0,
+		"codigoAutorizacao": 993.0,
 		"status": "AUTORIZADO"
 	},
 	"formaPagamentoModel": {
@@ -46,33 +44,122 @@ Response:
 ~~~
 
 Estorno:
-
 ~~~
 {
-	"id": "0aeb7540-274e-4c9c-8f13-aa62643646a6",
-	"cartao": 1424214,
+	"id": "18f4fa82-6268-4d68-94d5-9de4220d36b8",
+	"cartao": 5165165156,
 	"descricaoModel": {
 		"valor": 100.0,
 		"dataHora": "2021-01-25T18:30:00",
 		"estabelecimento": "PetShop Mundo Cão",
-		"nsu": null,
-		"codigoAutorizacao": null,
+		"nsu": 149.0,
+		"codigoAutorizacao": 320.0,
 		"status": "CANCELADO"
 	},
 	"formaPagamentoModel": {
 		"tipo": "AVISTA",
 		"parcelas": 1
+	},
+	"_links": {
+		"self": {
+			"href": "http://localhost:8080/transacoes/18f4fa82-6268-4d68-94d5-9de4220d36b8"
+		}
 	}
 }
 ~~~
 
+GetAll Exemple
+~~~
+
+{
+	"content": [
+		{
+			"id": "56e90714-1d82-4bfa-9bdd-559c853a39d6",
+			"cartao": 5165165156,
+			"descricaoModel": {
+				"valor": 100.0,
+				"dataHora": "2021-01-25T18:30:00",
+				"estabelecimento": "PetShop Mundo Cão",
+				"nsu": 104.0,
+				"codigoAutorizacao": 993.0,
+				"status": "AUTORIZADO"
+			},
+			"formaPagamentoModel": {
+				"tipo": "AVISTA",
+				"parcelas": 1
+			},
+			"links": [
+				{
+					"rel": "self",
+					"href": "http://localhost:8080/transacoes/56e90714-1d82-4bfa-9bdd-559c853a39d6"
+				}
+			]
+		}
+	],
+	"pageable": {
+		"sort": {
+			"sorted": false,
+			"empty": true,
+			"unsorted": true
+		},
+		"pageNumber": 0,
+		"pageSize": 10,
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 1,
+	"first": true,
+	"size": 10,
+	"number": 0,
+	"sort": {
+		"sorted": false,
+		"empty": true,
+		"unsorted": true
+	},
+	"numberOfElements": 1,
+	"empty": false
+}
+
+~~~
+
+GetOne Exemple 
+~~~
+{
+	"id": "56e90714-1d82-4bfa-9bdd-559c853a39d6",
+	"cartao": 5165165156,
+	"descricaoModel": {
+		"valor": 100.0,
+		"dataHora": "2021-01-25T18:30:00",
+		"estabelecimento": "PetShop Mundo Cão",
+		"nsu": 104.0,
+		"codigoAutorizacao": 993.0,
+		"status": "AUTORIZADO"
+	},
+	"formaPagamentoModel": {
+		"tipo": "AVISTA",
+		"parcelas": 1
+	},
+	"links": [
+		{
+			"rel": "self",
+			"href": "http://localhost:8080/transacoes/56e90714-1d82-4bfa-9bdd-559c853a39d6"
+		}
+	]
+}
+~~~
+
+
 <h3>Iniciando...</h3>
 
 - jdk17
-- https://github.com/luizfellipes/ToolsChallange.git<br>
+- clonar o projeto https://github.com/luizfellipes/ToolsChallange.git<br>
 - baixar todas as dependencias solicitada no pom.xml<br>
 - Banco de Dados Relacional em memoria H2<br>
 - Swagger http://localhost:8080/swagger-ui/index.html#/
+- SonarCube http://localhost:9000/sessions/new?return_to=%2F
 
 <h3>Executando a aplicação</h3>
 
@@ -81,6 +168,9 @@ Como se trata de uma aplicação teste rode ela pela classe SpringApplication.ru
 docker build -t toolschallange .<br>
 docker run -p 8080:8080 toolschallange
 
+para o sonarCube
+docker-compose up na pasta raiz do projeto
+
 <h3>Objetivo</h3>
-Criar uma API Rest para estudo baseado em java com framework SpringBoot
+Criar uma API Rest para estudo baseado em java com framework SpringBoot, para estudo e conhecimento
 

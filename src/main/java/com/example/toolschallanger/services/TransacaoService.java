@@ -1,5 +1,6 @@
 package com.example.toolschallanger.services;
 
+import com.example.toolschallanger.controller.TransacaoController;
 import com.example.toolschallanger.exceptions.TransacaoBadRequest;
 import com.example.toolschallanger.exceptions.TransacaoNaoEncontrada;
 import com.example.toolschallanger.models.dtos.TransacaoRecordDTO;
@@ -19,6 +20,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.example.toolschallanger.config.CopyPropertiesConfig.copyProperties;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class TransacaoService {
@@ -58,6 +61,11 @@ public class TransacaoService {
     public Page<TransacaoModel> findAll(Pageable pageable) {
         return Optional.of(transacaoRepository.findAll(pageable))
                 .stream()
+                .map(transacoes -> {
+                    transacoes.forEach(transacao ->
+                            transacao.add(linkTo(methodOn(TransacaoController.class).getOne(transacao.getId())).withSelfRel()));
+                    return transacoes;
+                })
                 .peek(l -> log.info("A search was carried out on the base."))
                 .findFirst()
                 .orElseThrow(() -> new TransacaoNaoEncontrada("Não há dados na base."));
@@ -66,6 +74,7 @@ public class TransacaoService {
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.ofNullable(transacaoRepository.findById(id)
                 .stream()
+                .map(transacao -> transacao.add(linkTo(methodOn(TransacaoController.class).getOne(id)).withSelfRel()))
                 .peek(l -> log.info("The following id was searched: {}", id))
                 .findFirst()
                 .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));

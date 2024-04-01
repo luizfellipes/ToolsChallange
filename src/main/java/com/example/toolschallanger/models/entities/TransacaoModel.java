@@ -1,6 +1,7 @@
 package com.example.toolschallanger.models.entities;
 
 import jakarta.persistence.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "TB_TRANSACAO")
-public class TransacaoModel implements Serializable {
+public class TransacaoModel extends RepresentationModel<TransacaoModel> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
