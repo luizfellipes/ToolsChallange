@@ -61,7 +61,6 @@ class TransacaoServiceTest {
     }
 
 
-
     @Test
     void deveTestarEstorno() {
         TransacaoModel transacaoModel = requestMockModel();
@@ -174,15 +173,17 @@ class TransacaoServiceTest {
     @Test
     void deveDarErroAoRealizarDelete() {
         doThrow(new TransacaoBadRequest()).when(transacaoRepository).deleteById(any(UUID.class));
+        when(transacaoRepository.findById(any())).thenThrow(new TransacaoBadRequest());
 
         Executable delete = () -> transacaoService.deleteById(UUID.randomUUID());
 
-        Assertions.assertThrows(TransacaoNaoEncontrada.class, delete);
+        Assertions.assertThrows(TransacaoBadRequest.class, delete);
     }
 
     @Test
     void deveDarErroAoRealizarUpdate() {
         when(transacaoRepository.save(any())).thenThrow(new TransacaoNaoEncontrada());
+        when(transacaoRepository.findById(any())).thenThrow(new TransacaoNaoEncontrada());
 
         Executable update = () -> transacaoService.updateById(UUID.randomUUID(), requestMockNullDTO());
 

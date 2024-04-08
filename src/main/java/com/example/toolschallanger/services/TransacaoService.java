@@ -59,25 +59,23 @@ public class TransacaoService {
     }
 
     public Page<TransacaoModel> findAll(Pageable pageable) {
-        return Optional.of(transacaoRepository.findAll(pageable))
-                .stream()
-                .map(transacoes -> {
-                    transacoes.forEach(transacao ->
-                            transacao.add(linkTo(methodOn(TransacaoController.class).getOne(transacao.getId())).withSelfRel()));
-                    return transacoes;
-                })
-                .peek(l -> log.info("A search was carried out on the base."))
-                .findFirst()
+        return Optional.of(transacaoRepository.findAll(pageable)
+                        .map(transacoes -> {
+                            transacoes.add(linkTo(methodOn(TransacaoController.class).getOne(transacoes.getId())).withSelfRel());
+                            log.info("A search was carried out on the base.");
+                            return transacoes;
+                        }))
                 .orElseThrow(() -> new TransacaoNaoEncontrada("Não há dados na base."));
     }
 
     public Optional<TransacaoModel> findById(UUID id) {
-        return Optional.ofNullable(transacaoRepository.findById(id)
-                .stream()
-                .map(transacao -> transacao.add(linkTo(methodOn(TransacaoController.class).getOne(id)).withSelfRel()))
-                .peek(l -> log.info("The following id was searched: {}", id))
-                .findFirst()
-                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));
+        return Optional.of(transacaoRepository.findById(id)
+                        .map(transacao -> {
+                            transacao.add(linkTo(methodOn(TransacaoController.class).getOne(id)).withSelfRel());
+                            log.info("The following id was searched: {}", id);
+                            return transacao;
+                        }))
+                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !"));
     }
 
     public void deleteById(UUID id) {
