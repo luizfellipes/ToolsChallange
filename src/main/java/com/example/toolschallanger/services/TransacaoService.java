@@ -55,7 +55,7 @@ public class TransacaoService {
                     return transacaoModel;
                 })
                 .findFirst()
-                .orElseThrow(TransacaoBadRequest::new);
+                .orElseThrow(() -> new TransacaoBadRequest("Essa transação já foi cancelada !"));
     }
 
     public Page<TransacaoModel> findAll(Pageable pageable) {
@@ -70,12 +70,12 @@ public class TransacaoService {
 
     public Optional<TransacaoModel> findById(UUID id) {
         return Optional.of(transacaoRepository.findById(id)
-                        .map(transacao -> {
-                            transacao.add(linkTo(methodOn(TransacaoController.class).getOne(id)).withSelfRel());
-                            log.info("The following id was searched: {}", id);
-                            return transacao;
-                        }))
-                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !"));
+                .map(transacao -> {
+                    transacao.add(linkTo(methodOn(TransacaoController.class).getOne(id)).withSelfRel());
+                    log.info("The following id was searched: {}", id);
+                    return transacao;
+                })
+                .orElseThrow(() -> new TransacaoNaoEncontrada("ID não existente !")));
     }
 
     public void deleteById(UUID id) {
@@ -114,12 +114,10 @@ public class TransacaoService {
     }
 
     public TransacaoModel converterDtoEmEntity(TransacaoRecordDTO transacaoRecordDTO) {
-        return new TransacaoModel(
-                transacaoRecordDTO.cartao(),
+        return new TransacaoModel(transacaoRecordDTO.cartao(),
                 transacaoRecordDTO.descricaoDePagamento() != null ?
                         new DescricaoModel(transacaoRecordDTO.descricaoDePagamento().valor(), transacaoRecordDTO.descricaoDePagamento().dataHora(), transacaoRecordDTO.descricaoDePagamento().estabelecimento()) : null,
                 transacaoRecordDTO.formaDePagamento() != null ?
                         new FormaPagamentoModel(transacaoRecordDTO.formaDePagamento().tipo(), transacaoRecordDTO.formaDePagamento().parcelas()) : null);
     }
-
 }
